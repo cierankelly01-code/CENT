@@ -32,3 +32,6 @@ yarn-error.log*
 /*.png
 /*.jpg
 /*.jpeg
+
+# local Claude settings (machine-specific)
+.claude/settings.local.json
