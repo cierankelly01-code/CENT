@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Channel triplets so Tailwind opacity modifiers (text-bone/75 etc.) work. */
+  --color-bone: 244 241 234;
+  --color-ink: 26 23 20;
+  --color-graphite: 35 32 32;
+  --color-bronze: 176 125 75;
+  --color-bronze-deep: 138 94 51;
+  --color-mist: 218 212 200;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--color-bone));
+    color: rgb(var(--color-ink));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible bronze focus ring on every interactive element */
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-bronze));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .container-edge {
+    @apply mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-12;
+  }
+
+  .eyebrow {
+    @apply font-sans text-xs font-medium uppercase tracking-[0.22em] text-bronze-deep;
+  }
+}
+
+/* Scroll-reveal: subtle fade + small translate, gated by prefers-reduced-motion */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Film-grain depth overlay for dark, cinematic sections.
+   Subtle noise lifts flat dark fills toward a photographed, premium feel. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Living aurora — slow drifting warm glow that makes the hero feel alive */
+@keyframes aurora-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(8%, -6%) scale(1.18); }
+}
+@keyframes aurora-b {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-10%, 8%) scale(0.92); }
+}
+.aurora-a { animation: aurora-a 16s ease-in-out infinite; }
+.aurora-b { animation: aurora-b 20s ease-in-out infinite; }
+
+/* Kinetic headline word swap */
+@keyframes kinetic-in {
+  0% { opacity: 0; transform: translateY(0.4em); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.kinetic-word { animation: kinetic-in 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* Spec ticker marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 28s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-a, .aurora-b, .kinetic-word, .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* Hero product gentle float */
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-float {
+    animation: none !important;
+  }
+}
+
+/* Product-explorer hotspot pulse */
+@keyframes hotspot-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(176, 125, 75, 0.55); }
+  70% { box-shadow: 0 0 0 14px rgba(176, 125, 75, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(176, 125, 75, 0); }
+}
+
+.hotspot-pulse {
+  animation: hotspot-pulse 2.4s ease-out infinite;
+}
+
+/* Explorer: gentle zoom whose focal point glides to the active hotspot.
+   Kept subtle (1.05) so the current photo isn't magnified into blur. */
+.explorer-zoom {
+  transform: scale(1.05);
+  transition: transform-origin 0.55s ease, transform 0.55s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explorer-zoom {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-pulse {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
