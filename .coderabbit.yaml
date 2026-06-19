@@ -1,0 +1,30 @@
+# CodeRabbit configuration — https://docs.coderabbit.ai
+language: "en-GB"
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+  path_filters:
+    - "!**/*.png"
+    - "!**/*.jpg"
+    - "!**/*.jpeg"
+    - "!package-lock.json"
+  # Areas we especially care about on this project.
+  path_instructions:
+    - path: "components/**"
+      instructions: >
+        Flag accessibility regressions (missing labels/alt, colour-contrast risks,
+        keyboard traps) and any hard-coded colours outside the Tailwind design tokens.
+    - path: "components/ConfigureClient.tsx"
+      instructions: >
+        This writes leads to Supabase. Check validation, error handling, and that no
+        sensitive data is logged.
+chat:
+  auto_reply: true
