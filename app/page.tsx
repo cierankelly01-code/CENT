@@ -1,6 +1,5 @@
 import Link from "next/link";
 import HeroBuy from "@/components/sections/HeroBuy";
-import SpecTicker from "@/components/SpecTicker";
 import Comparison from "@/components/Comparison";
 import Specs from "@/components/Specs";
 import Gallery from "@/components/Gallery";
@@ -31,7 +30,6 @@ export default function Home() {
   return (
     <>
       <HeroBuy />
-      <SpecTicker />
 
       {/* Key facts */}
       <section className="border-t border-mist bg-bone">
