@@ -30,15 +30,21 @@ create table if not exists build_configs (
                     check (status in ('draft','submitted','under_review','quoted','confirmed','archived','abandoned')),
 
   -- The current specification. Structured, BOM-ready (see lib/configurator/types.ts).
-  config_payload    jsonb not null default '{}'::jsonb,
+  -- Default mirrors emptyBuildPayload() so rows are always contract-shaped, never bare {}.
+  config_payload    jsonb not null default
+    '{"schema_version":1,"selections":{},"multi":{},"freeText":{},"meta":{"completed_steps":[],"last_step":0}}'::jsonb,
   config_version    int  not null default 1,        -- mirrors the latest build_config_versions row
 
   submitted_at      timestamptz,
 
-  -- UK GDPR consent record.
+  -- UK GDPR consent record. Consent evidence must be complete when consent is given.
   consent_given     boolean not null default false,
   consent_at        timestamptz,
-  consent_text      text                            -- exact wording shown, for audit
+  consent_text      text,                           -- exact wording shown, for audit
+  check (
+    (consent_given = false)
+    or (consent_given = true and consent_at is not null and consent_text is not null)
+  )
 );
 
 create index if not exists build_configs_status_idx on build_configs (status);
@@ -77,6 +83,29 @@ create table if not exists build_config_events (
 
 create index if not exists build_config_events_parent_idx
   on build_config_events (build_config_id, created_at desc);
+
+-- ---------------------------------------------------------------------------
+-- Enforce append-only history at the DB layer (defends against a server-side bug
+-- rewriting audit history, even via the service role which bypasses RLS).
+-- We block UPDATE only — DELETE is deliberately allowed so the `on delete cascade`
+-- from build_configs still works for UK GDPR right-to-erasure.
+-- ---------------------------------------------------------------------------
+create or replace function prevent_update_on_append_only()
+returns trigger language plpgsql as $$
+begin
+  raise exception 'append-only table %: UPDATE is not allowed', tg_table_name;
+end;
+$$;
+
+drop trigger if exists build_config_versions_no_update on build_config_versions;
+create trigger build_config_versions_no_update
+  before update on build_config_versions
+  for each row execute function prevent_update_on_append_only();
+
+drop trigger if exists build_config_events_no_update on build_config_events;
+create trigger build_config_events_no_update
+  before update on build_config_events
+  for each row execute function prevent_update_on_append_only();
 
 -- ---------------------------------------------------------------------------
 -- Keep updated_at fresh on every write to build_configs.

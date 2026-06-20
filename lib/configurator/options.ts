@@ -303,7 +303,7 @@ export const BUILD_STEPS: BuildStep[] = [
         key: "controls.mount_side",
         label: "Which side should the control be on?",
         control: "radio",
-        hint: "So we mount your control on the right side for you.",
+        hint: "So we mount your control on your preferred side for you.",
         bom: "Mount-side assembly.",
         showIf: { key: "controls.type", codeIn: ["CTRL_JOYSTICK", "CTRL_BOTH"] },
         options: [
