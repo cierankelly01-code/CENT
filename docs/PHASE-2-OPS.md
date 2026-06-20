@@ -4,6 +4,23 @@ Captured the night before the Phase-1 site launch. This is the next build after 
 website is live and approved. It is an internal staff app that turns a configurator
 submission into an automated, end-to-end order workflow.
 
+## The full vision (Cieran) — THREE connected systems
+1. **Marketing-site inquiry configurator** *(Phase 1 — DONE).* Lives on the public website.
+   Job: get a customer to *enquire* and capture their needs. Low-friction, no pricing.
+2. **Deep build configurator** *(Phase 2 — customer-facing, separate app/site).* Sent to a
+   serious customer once they're in. A proper deep-dive spec tool to fully configure the actual
+   wheelchair they want built — every option, fit, finish, component.
+3. **Company operating system / ERP** *(Phase 2/3 — internal).* Sees *everything*: website →
+   both configurators → stock. For a given build it knows what's in stock vs. what must be
+   ordered, where each part comes from, and how long it takes — so it **auto-generates a quote
+   with a real price + delivery ETA** the moment the deep configurator is finished. Human-in-the-
+   loop at first (staff approve POs/quotes); eventually the AI **orders the parts itself**.
+
+The seam is already in place: both configurators write to Supabase `config_payload` (jsonb) +
+`status`; the ERP reads them, explodes the BOM, checks stock, computes price + ETA, and drives
+procurement. Build order: inquiry config (done) → ERP pipeline + auth → BOM/pricing/stock →
+deep build configurator → automated quoting → automated ordering.
+
 ## How it connects to what's already built
 - The public configurator (`/configure`) already writes every submission into Supabase
   `quote_requests`, with the full spec in **`config_payload` (jsonb)** and a **`status`** column
