@@ -65,7 +65,11 @@ export function validatePayload(input: unknown): BuildConfigPayload {
     out.meta.completed_steps = Array.from(
       new Set(
         meta.completed_steps.filter(
-          (n): n is number => typeof n === "number" && n >= 0 && n < BUILD_STEP_COUNT
+          (n): n is number =>
+            typeof n === "number" &&
+            Number.isInteger(n) &&
+            n >= 0 &&
+            n < BUILD_STEP_COUNT
         )
       )
     );

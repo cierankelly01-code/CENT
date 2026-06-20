@@ -125,7 +125,9 @@ export async function saveDraft(
 ): Promise<ClientBuildConfig | null> {
   const row = await getVerifiedRow(ref, token);
   if (!row) return null;
-  if (row.status === "archived" || row.status === "abandoned") return null;
+  // Autosave applies only to drafts. Once submitted, the live row is frozen to the customer
+  // (staff/ERP read it); a future "reopen to edit" flow will deliberately reset to draft.
+  if (row.status !== "draft") return null;
 
   const update: Record<string, unknown> = {};
   if (patch.config_payload !== undefined) update.config_payload = validatePayload(patch.config_payload);
@@ -138,13 +140,16 @@ export async function saveDraft(
 
   if (Object.keys(update).length === 0) return toClientBuildConfig(row);
 
+  // Re-assert status in the UPDATE so a concurrent submit can't be clobbered (atomic guard).
   const { data, error } = await getServiceClient()
     .from("build_configs")
     .update(update)
     .eq("id", row.id)
+    .eq("status", "draft")
     .select("*")
-    .single();
+    .maybeSingle();
   if (error) throw error;
+  if (!data) return null; // status changed under us (e.g. submitted concurrently)
   const updated = data as unknown as BuildConfigRow;
   await logEvent(updated.id, "customer", "autosaved");
   return toClientBuildConfig(updated);
@@ -171,8 +176,12 @@ export async function submitBuild(
 ): Promise<ClientBuildConfig | null> {
   const row = await getVerifiedRow(ref, token);
   if (!row) return null;
-  if (row.status === "archived" || row.status === "abandoned") {
-    throw new BuildSubmitError("This build can no longer be submitted.");
+  if (row.status !== "draft") {
+    throw new BuildSubmitError(
+      row.status === "submitted"
+        ? "This build has already been submitted."
+        : "This build can no longer be submitted."
+    );
   }
 
   if (input.consent_given !== true) {
@@ -192,48 +201,19 @@ export async function submitBuild(
   const payload =
     input.config_payload !== undefined ? validatePayload(input.config_payload) : row.config_payload;
 
-  const supabase = getServiceClient();
-
-  // Next snapshot version = max existing + 1 (so config_version always equals the latest snapshot).
-  const { data: maxRow, error: maxErr } = await supabase
-    .from("build_config_versions")
-    .select("version")
-    .eq("build_config_id", row.id)
-    .order("version", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (maxErr) throw maxErr;
-  const nextVersion = ((maxRow as { version?: number } | null)?.version ?? 0) + 1;
-
-  const { error: vErr } = await supabase.from("build_config_versions").insert({
-    build_config_id: row.id,
-    version: nextVersion,
-    config_payload: payload,
-    created_by: "customer",
-    note: "Customer submission",
+  // Atomic: compute next version, insert the immutable snapshot, and flip status in ONE
+  // DB transaction (see submit_build() in supabase/build-schema.sql) so a partial failure
+  // can't leave an orphan snapshot or a stale live row.
+  const { data, error } = await getServiceClient().rpc("submit_build", {
+    p_build_id: row.id,
+    p_payload: payload,
+    p_consent_text: consentText,
+    p_customer_name: customerName,
+    p_customer_email: customerEmail,
+    p_customer_phone: customerPhone,
   });
-  if (vErr) throw vErr;
-
-  const nowIso = new Date().toISOString();
-  const { data, error } = await supabase
-    .from("build_configs")
-    .update({
-      status: "submitted",
-      submitted_at: nowIso,
-      consent_given: true,
-      consent_at: nowIso,
-      consent_text: consentText,
-      config_payload: payload,
-      config_version: nextVersion,
-      customer_email: customerEmail,
-      customer_name: customerName,
-      customer_phone: customerPhone,
-    })
-    .eq("id", row.id)
-    .select("*")
-    .single();
   if (error) throw error;
   const updated = data as unknown as BuildConfigRow;
-  await logEvent(updated.id, "customer", "submitted", { version: nextVersion });
+  await logEvent(updated.id, "customer", "submitted", { version: updated.config_version });
   return toClientBuildConfig(updated);
 }
