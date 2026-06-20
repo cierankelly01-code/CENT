@@ -5,8 +5,10 @@ node_modules
 
 # next.js
 .next
-out
-build
+/out
+# Anchored to the repo root: Next.js never outputs to ./build, and the configurator uses
+# /build and /api/build route namespaces (see docs/PHASE-2-BUILD-CONFIGURATOR.md).
+/build
 
 # production env / secrets
 .env.local
