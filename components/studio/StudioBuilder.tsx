@@ -17,8 +17,33 @@ type Selections = Record<string, string>; // field.key -> option_code (single ch
 type MultiSel = Record<string, string[]>; // field.key -> option_code[]
 type FreeText = Record<string, string>; // field.key -> text
 
+type PersistedState = {
+  step?: number;
+  selections?: Record<string, string>;
+  multi?: Record<string, string[]>;
+  freeText?: Record<string, string>;
+};
+
 const REVIEW_STEP = BUILD_STEPS.length;
 const TOTAL_STEPS = BUILD_STEPS.length + 1; // + review
+
+function isStringRecord(v: unknown): v is Record<string, string> {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    Object.values(v).every((x) => typeof x === "string")
+  );
+}
+
+function isStringArrayRecord(v: unknown): v is Record<string, string[]> {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    Object.values(v).every((x) => Array.isArray(x) && x.every((i) => typeof i === "string"))
+  );
+}
 
 /** A field is shown only when its showIf condition (if any) is satisfied. */
 function isVisible(field: BuildField, selections: Selections): boolean {
@@ -38,19 +63,19 @@ export default function StudioBuilder({ reference }: { reference: string }) {
   const [hydrated, setHydrated] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Restore on mount.
+  // Restore on mount — validate the persisted shape before trusting it.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
-        const s = JSON.parse(raw);
-        if (s.selections) setSelections(s.selections);
-        if (s.multi) setMulti(s.multi);
-        if (s.freeText) setFreeText(s.freeText);
+        const s: PersistedState = JSON.parse(raw);
+        if (isStringRecord(s.selections)) setSelections(s.selections);
+        if (isStringArrayRecord(s.multi)) setMulti(s.multi);
+        if (isStringRecord(s.freeText)) setFreeText(s.freeText);
         if (typeof s.step === "number") setStep(Math.min(Math.max(0, s.step), REVIEW_STEP));
       }
     } catch {
-      /* ignore */
+      /* ignore malformed storage */
     }
     setHydrated(true);
   }, [storageKey]);
@@ -99,7 +124,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
   }
 
   // Build review rows from every visible, answered field, each linking back to its step.
-  const reviewRows: { label: string; value: string; step: number }[] = [];
+  const reviewRows: { id: string; label: string; value: string; step: number }[] = [];
   BUILD_STEPS.forEach((def, i) => {
     def.fields.forEach((f) => {
       if (!isVisible(f, selections)) return;
@@ -107,6 +132,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
         const codes = multi[f.key] ?? [];
         if (codes.length) {
           reviewRows.push({
+            id: f.key,
             label: f.label,
             value: codes.map((c) => optionLabel(f, c)).join(", "),
             step: i,
@@ -114,10 +140,10 @@ export default function StudioBuilder({ reference }: { reference: string }) {
         }
       } else if (f.control === "text" || f.control === "textarea") {
         const t = freeText[f.key]?.trim();
-        if (t) reviewRows.push({ label: f.label, value: t, step: i });
+        if (t) reviewRows.push({ id: f.key, label: f.label, value: t, step: i });
       } else {
         const code = selections[f.key];
-        if (code) reviewRows.push({ label: f.label, value: optionLabel(f, code), step: i });
+        if (code) reviewRows.push({ id: f.key, label: f.label, value: optionLabel(f, code), step: i });
       }
     });
   });
@@ -147,7 +173,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
             aria-label="Build progress"
           >
             <div
-              className="h-full rounded-full bg-bronze-deep transition-[width] duration-500 ease-out"
+              className="h-full rounded-full bg-bronze-deep transition-[width] duration-500 ease-out motion-reduce:transition-none"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -183,7 +209,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
                   <dl className="mt-4 divide-y divide-mist">
                     {reviewRows.map((r) => (
                       <div
-                        key={r.label}
+                        key={`${r.step}:${r.id}`}
                         className="flex items-baseline justify-between gap-4 py-2.5"
                       >
                         <dt className="shrink-0 font-sans text-sm text-ink/70">{r.label}</dt>
@@ -236,7 +262,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
             type="button"
             onClick={goBack}
             disabled={step === 0}
-            className="font-sans text-sm font-medium text-ink/70 transition-colors hover:text-ink disabled:invisible"
+            className="font-sans text-sm font-medium text-ink/70 transition-colors motion-reduce:transition-none hover:text-ink disabled:invisible"
           >
             ← Back
           </button>
@@ -245,7 +271,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
               type="button"
               onClick={goNext}
               disabled={!canProceed(step)}
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors motion-reduce:transition-none hover:bg-bronze-deeper disabled:cursor-not-allowed disabled:opacity-50"
             >
               Continue
             </button>
@@ -253,7 +279,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
             <button
               type="button"
               onClick={() => setSaved(true)}
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29]"
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors motion-reduce:transition-none hover:bg-bronze-deeper"
             >
               Save my progress
             </button>
@@ -289,7 +315,8 @@ function FieldRenderer({
     <Field label={field.label} hint={field.hint} required={field.required}>
       {field.control === "radio" && (
         <Radio
-          name={field.label}
+          name={field.key}
+          legend={field.label}
           value={singleValue}
           onChange={onSingle}
           options={options.map((o) => [o.code, o.label] as [string, string])}
@@ -305,7 +332,11 @@ function FieldRenderer({
         />
       )}
       {field.control === "multi" && (
-        <Chips options={options.map((o) => [o.code, o.label] as [string, string])} selected={multiValue} onToggle={onToggle} />
+        <Chips
+          options={options.map((o) => [o.code, o.label] as [string, string])}
+          selected={multiValue}
+          onToggle={onToggle}
+        />
       )}
       {field.control === "text" && (
         <input
@@ -332,7 +363,7 @@ function FieldRenderer({
   );
 }
 
-// --- Accessible primitives (mirrors the axe-clean /configure patterns) ------
+// --- Accessible primitives -------------------------------------------------
 
 function Step({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
@@ -392,7 +423,7 @@ function Chips({
             type="button"
             aria-pressed={on}
             onClick={() => onToggle(code)}
-            className={`rounded-full border px-4 py-2 font-sans text-sm transition-colors ${
+            className={`rounded-full border px-4 py-2 font-sans text-sm transition-colors motion-reduce:transition-none ${
               on
                 ? "border-bronze-deep bg-bronze-deep text-bone"
                 : "border-mist text-ink/80 hover:border-bronze-deep/60"
@@ -406,36 +437,49 @@ function Chips({
   );
 }
 
+/**
+ * Native radio group — real <input type="radio"> elements give correct radiogroup
+ * semantics and arrow-key navigation for free. The input is visually hidden; the styled
+ * card shows selection + a focus ring (via peer-focus-visible) so keyboard users see focus.
+ */
 function Radio({
   name,
+  legend,
   value,
   onChange,
   options,
 }: {
   name: string;
+  legend: string;
   value: string;
   onChange: (code: string) => void;
   options: [string, string][];
 }) {
   return (
     <fieldset>
-      <legend className="sr-only">{name}</legend>
+      <legend className="sr-only">{legend}</legend>
       <div className="grid gap-3 sm:grid-cols-3">
         {options.map(([code, label]) => {
           const on = value === code;
           return (
-            <button
-              key={code}
-              type="button"
-              role="radio"
-              aria-checked={on}
-              onClick={() => onChange(code)}
-              className={`rounded-lg border px-4 py-4 text-left font-sans text-base transition-colors ${
-                on ? "border-bronze-deep bg-bronze/10 text-ink" : "border-mist text-ink/80 hover:border-bronze-deep/50"
-              }`}
-            >
-              <span className="flex items-center gap-2">
+            <label key={code} className="block cursor-pointer">
+              <input
+                type="radio"
+                name={name}
+                value={code}
+                checked={on}
+                onChange={() => onChange(code)}
+                className="peer sr-only"
+              />
+              <span
+                className={`flex items-center gap-2 rounded-lg border px-4 py-4 font-sans text-base transition-colors motion-reduce:transition-none peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-[3px] peer-focus-visible:outline-bronze ${
+                  on
+                    ? "border-bronze-deep bg-bronze/10 text-ink"
+                    : "border-mist text-ink/80 hover:border-bronze-deep/50"
+                }`}
+              >
                 <span
+                  aria-hidden
                   className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
                     on ? "border-bronze-deep" : "border-ink/40"
                   }`}
@@ -444,7 +488,7 @@ function Radio({
                 </span>
                 {label}
               </span>
-            </button>
+            </label>
           );
         })}
       </div>
@@ -476,9 +520,9 @@ function Select({
       <option value="" disabled>
         Select an option
       </option>
-      {options.map(([code, label]) => (
+      {options.map(([code, optionText]) => (
         <option key={code} value={code}>
-          {label}
+          {optionText}
         </option>
       ))}
     </select>

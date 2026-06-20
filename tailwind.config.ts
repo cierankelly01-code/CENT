@@ -13,6 +13,7 @@ const config: Config = {
         graphite: "rgb(var(--color-graphite) / <alpha-value>)",
         bronze: "rgb(var(--color-bronze) / <alpha-value>)",
         "bronze-deep": "rgb(var(--color-bronze-deep) / <alpha-value>)",
+        "bronze-deeper": "rgb(var(--color-bronze-deeper) / <alpha-value>)",
         mist: "rgb(var(--color-mist) / <alpha-value>)",
       },
       fontFamily: {
