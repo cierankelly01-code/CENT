@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import ScrollProgress from "@/components/ScrollProgress";
+import MarketingChrome from "@/components/MarketingChrome";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -81,10 +79,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ScrollProgress />
-        <Nav />
-        {children}
-        <Footer />
+        <MarketingChrome>{children}</MarketingChrome>
       </body>
     </html>
   );
