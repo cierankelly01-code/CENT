@@ -144,6 +144,10 @@ declare
   v_next int;
   v_row  build_configs;
 begin
+  -- Serialise concurrent submit attempts on this build so version numbering has a single
+  -- winner (the loser then fails the status='draft' guard below, cleanly).
+  perform 1 from build_configs where id = p_build_id for update;
+
   select coalesce(max(version), 0) + 1 into v_next
     from build_config_versions
     where build_config_id = p_build_id;
