@@ -6,6 +6,7 @@ const EXPLORE = [
   { href: "/who-its-for", label: "Who it's for" },
   { href: "/story", label: "Our story" },
   { href: "/why-us", label: "Why us" },
+  { href: "/news", label: "News & events" },
 ];
 
 export default function Footer() {
