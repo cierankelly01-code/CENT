@@ -124,6 +124,60 @@ create trigger build_configs_set_updated_at
   for each row execute function set_build_configs_updated_at();
 
 -- ---------------------------------------------------------------------------
+-- Atomic submit: compute the next snapshot version, write the immutable version row, and
+-- flip the live row to 'submitted' (with consent) — all in one transaction. The plpgsql
+-- function body runs atomically, so a partial failure can't leave an orphan snapshot or a
+-- stale live row. Called from the server via supabase.rpc('submit_build', …).
+-- Guards on status = 'draft' so a build can only be submitted once.
+-- ---------------------------------------------------------------------------
+create or replace function submit_build(
+  p_build_id       uuid,
+  p_payload        jsonb,
+  p_consent_text   text,
+  p_customer_name  text,
+  p_customer_email text,
+  p_customer_phone text
+)
+returns build_configs
+language plpgsql as $$
+declare
+  v_next int;
+  v_row  build_configs;
+begin
+  -- Serialise concurrent submit attempts on this build so version numbering has a single
+  -- winner (the loser then fails the status='draft' guard below, cleanly).
+  perform 1 from build_configs where id = p_build_id for update;
+
+  select coalesce(max(version), 0) + 1 into v_next
+    from build_config_versions
+    where build_config_id = p_build_id;
+
+  insert into build_config_versions (build_config_id, version, config_payload, created_by, note)
+  values (p_build_id, v_next, p_payload, 'customer', 'Customer submission');
+
+  update build_configs set
+    status         = 'submitted',
+    submitted_at   = now(),
+    consent_given  = true,
+    consent_at     = now(),
+    consent_text   = p_consent_text,
+    config_payload = p_payload,
+    config_version = v_next,
+    customer_email = p_customer_email,
+    customer_name  = p_customer_name,
+    customer_phone = p_customer_phone
+  where id = p_build_id and status = 'draft'
+  returning * into v_row;
+
+  if v_row.id is null then
+    raise exception 'build % is not in draft status', p_build_id;
+  end if;
+
+  return v_row;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- Row Level Security: lock all three tables to the browser entirely.
 -- Enabled with NO anon/authenticated policies → only the service-role key (used by our
 -- server-side Route Handlers) can read/write. Staff read/write arrives later as

@@ -319,9 +319,28 @@ not a price; copy sets expectation that a tailored quote follows (ERP). Data is 
 
 ---
 
+## Environment & server boundary
+
+The deep configurator reads state back, so (unlike `/configure`) it does **not** touch
+Supabase from the browser. All access is server-side, via Route Handlers under
+`app/api/build/…`, using a new **server-only** env var:
+
+| Env var | Where | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | already set | shared with Phase 1 |
+| `SUPABASE_SERVICE_ROLE_KEY` | **add in Vercel** (server-only) | bypasses RLS — never exposed to the client; gated behind the capability-token check. CI uses a dummy value. |
+
+Endpoints (all Node runtime, `force-dynamic`, capability-token gated):
+`POST /api/build` (create draft → returns `ref` + one-time `token`) ·
+`GET /api/build/:ref` (load) · `PATCH /api/build/:ref` (autosave) ·
+`POST /api/build/:ref/submit` (consent + version snapshot + status → submitted).
+Untrusted payloads pass through `validatePayload()` (registry-checked, label re-derived
+server-side). Autosave updates the live row only; versions are snapshotted at submit (and
+later staff edits) to avoid per-keystroke version spam.
+
 ## Incremental delivery plan (small PRs, each CI-green + axe-clean)
 
-1. **Schema + types** — `supabase/build-schema.sql`, the `option_code` registry, TS types.
+1. **Schema + types** — `supabase/build-schema.sql`, the `option_code` registry, TS types. ✅ (PR 1)
 2. **Server access layer** — Route Handlers (create / read / autosave / submit), token
    hashing, `ref` generation, versioning, event log. RLS locked; service-role server-only.
 3. **Studio shell** — `(build)` route group + layout (branded chrome, save indicator).
