@@ -33,13 +33,44 @@ async function send(payload: EmailPayload): Promise<void> {
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) {
+      // Log status only — the response body can echo recipient/content (PII), keep it out of logs.
       // eslint-disable-next-line no-console
-      console.error("resend send failed:", res.status, await res.text().catch(() => ""));
+      console.error("resend send failed with status", res.status);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error("resend send error:", err);
   }
+}
+
+export type EnquiryEmailInput = {
+  name: string;
+  email: string;
+  phone?: string | null;
+  enquiryType: string;
+  message?: string | null;
+};
+
+/** Instant acknowledgement to the enquirer + alert to staff on a /configure submission.
+ *  Best-effort (never throws); no-ops without RESEND_API_KEY. */
+export async function sendEnquiryEmails(input: EnquiryEmailInput): Promise<void> {
+  const first = input.name?.trim().split(/\s+/)[0] || "there";
+  await Promise.all([
+    send({
+      from: FROM,
+      to: [input.email],
+      subject: "Thanks — we’ve got your Centaur enquiry",
+      html: `<p>Hi ${escapeHtml(first)},</p><p>Thank you for your interest in the Centaur. We’ve received your enquiry and a member of our team will be in touch shortly to talk it through and, when you’re ready, arrange a test drive. No payment, no commitment.</p><p>— Centaur Robotics</p>`,
+      text: `Hi ${first},\n\nThank you for your interest in the Centaur. We’ve received your enquiry and a member of our team will be in touch shortly to talk it through and, when you’re ready, arrange a test drive. No payment, no commitment.\n\n— Centaur Robotics`,
+    }),
+    send({
+      from: FROM,
+      to: [STAFF],
+      subject: `New Centaur enquiry — ${input.name}`,
+      html: `<p>A new enquiry came in.</p><ul><li>Name: ${escapeHtml(input.name)}</li><li>Email: ${escapeHtml(input.email)}</li><li>Phone: ${escapeHtml(input.phone || "—")}</li><li>Type: ${escapeHtml(input.enquiryType)}</li></ul>${input.message ? `<p>Message: ${escapeHtml(input.message)}</p>` : ""}`,
+      text: `A new enquiry came in.\nName: ${input.name}\nEmail: ${input.email}\nPhone: ${input.phone || "—"}\nType: ${input.enquiryType}${input.message ? `\nMessage: ${input.message}` : ""}`,
+    }),
+  ]);
 }
 
 export type SubmissionEmailInput = {
