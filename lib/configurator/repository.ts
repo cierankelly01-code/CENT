@@ -262,7 +262,7 @@ export async function staffGetBuild(ref: string): Promise<{
   if (!row) return null;
   const build = row as unknown as BuildConfigRow;
 
-  const [{ data: versions }, { data: events }] = await Promise.all([
+  const [versionsResult, eventsResult] = await Promise.all([
     supabase
       .from("build_config_versions")
       .select("*")
@@ -275,10 +275,12 @@ export async function staffGetBuild(ref: string): Promise<{
       .order("created_at", { ascending: false })
       .limit(50),
   ]);
+  if (versionsResult.error) throw versionsResult.error;
+  if (eventsResult.error) throw eventsResult.error;
 
   return {
     build,
-    versions: (versions ?? []) as unknown as BuildConfigVersionRow[],
-    events: (events ?? []) as unknown as BuildConfigEventRow[],
+    versions: (versionsResult.data ?? []) as unknown as BuildConfigVersionRow[],
+    events: (eventsResult.data ?? []) as unknown as BuildConfigEventRow[],
   };
 }

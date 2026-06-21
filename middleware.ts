@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { isStaffEmail } from "@/lib/configurator/staff-allowlist";
 
 type CookieList = { name: string; value: string; options?: CookieOptions }[];
 
@@ -8,11 +9,17 @@ type CookieList = { name: string; value: string; options?: CookieOptions }[];
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req });
   const path = req.nextUrl.pathname;
-  if (path.startsWith("/staff/login")) return res;
+  const loginUrl = () => {
+    const to = req.nextUrl.clone();
+    to.pathname = "/staff/login";
+    return to;
+  };
+  if (path === "/staff/login" || path === "/staff/login/") return res;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return res;
+  // Fail closed: a protected route must not be reachable when auth config is absent.
+  if (!url || !anon) return NextResponse.redirect(loginUrl());
 
   const supabase = createServerClient(url, anon, {
     cookies: {
@@ -34,10 +41,8 @@ export async function middleware(req: NextRequest) {
     user = null;
   }
 
-  if (!user) {
-    const to = req.nextUrl.clone();
-    to.pathname = "/staff/login";
-    return NextResponse.redirect(to);
+  if (!user || !isStaffEmail(user.email)) {
+    return NextResponse.redirect(loginUrl());
   }
   return res;
 }
