@@ -18,6 +18,11 @@ export async function POST(req: Request, { params }: Ctx): Promise<Response> {
   if (!token) return errorResponse("Missing access token.", 401);
   try {
     const body = await readJsonObject(req);
+    // Trusted base URL (not req.url — the Host header is client-controlled and the resume
+    // link is emailed). Prefer explicit config, then Vercel's deployment URL, then prod.
+    const origin =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://centaurrobotics.com");
     const config = await submitBuild(params.ref, token, {
       consent_given: body.consent_given,
       consent_text: body.consent_text,
@@ -25,6 +30,7 @@ export async function POST(req: Request, { params }: Ctx): Promise<Response> {
       customer_name: body.customer_name,
       customer_email: body.customer_email,
       customer_phone: body.customer_phone,
+      resume_url: `${origin}/build/${encodeURIComponent(params.ref)}?t=${encodeURIComponent(token)}`,
     });
     if (!config) return errorResponse("Build not found.", 404);
     return jsonResponse({ config });

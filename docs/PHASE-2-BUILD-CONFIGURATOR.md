@@ -329,6 +329,9 @@ Supabase from the browser. All access is server-side, via Route Handlers under
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | already set | shared with Phase 1 |
 | `SUPABASE_SERVICE_ROLE_KEY` | **add in Vercel** (server-only) | bypasses RLS — never exposed to the client; gated behind the capability-token check. CI uses a dummy value. |
+| `RESEND_API_KEY` | add in Vercel (server-only) | transactional email on submit. Without it, email is skipped (submit still works). |
+| `RESEND_FROM` | optional | e.g. `Centaur Robotics <hello@centaurrobotics.com>` — TBC until domain verified; defaults to Resend's test sender. |
+| `STAFF_NOTIFY_EMAIL` | optional | where staff submission alerts go; defaults to hello@centaurrobotics.com. |
 
 Endpoints (all Node runtime, `force-dynamic`, capability-token gated):
 `POST /api/build` (create draft → returns `ref` + one-time `token`) ·
