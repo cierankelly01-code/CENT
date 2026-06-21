@@ -402,6 +402,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
                       type="checkbox"
                       checked={consent}
                       onChange={(ev) => setConsent(ev.target.checked)}
+                      aria-invalid={errors.consent ? true : undefined}
                       aria-describedby={errors.consent ? "bf-consent-error" : undefined}
                       className="mt-1 h-4 w-4 accent-bronze-deep"
                     />
