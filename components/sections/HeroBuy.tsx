@@ -61,6 +61,10 @@ export default function HeroBuy() {
             </Link>
           </div>
 
+          <p className="mt-4 font-sans text-sm text-ink/55">
+            No payment, no commitment — and a test drive when you&apos;re ready.
+          </p>
+
           <p className="mt-7 font-sans text-sm text-ink/70">
             In production · Engineered by an ex-Ford team · Built in Britain
           </p>
