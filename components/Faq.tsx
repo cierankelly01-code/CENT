@@ -27,9 +27,25 @@ const FAQS: [string, string][] = [
   ],
 ];
 
+// FAQPage structured data so the Q&As are eligible for rich results in search.
+// Generated from the same FAQS source above, so the markup never drifts from the copy.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map(([q, a]) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 export default function Faq() {
   return (
     <section className="border-t border-mist bg-bone">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="container-edge grid gap-12 py-20 md:py-28 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <Reveal>
           <div className="lg:sticky lg:top-28">
