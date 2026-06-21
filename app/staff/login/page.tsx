@@ -22,7 +22,7 @@ export default function StaffLogin() {
       );
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
-      router.push("/staff/builds");
+      router.push("/staff");
       router.refresh();
     } catch {
       setError("Sign-in failed. Check your email and password.");
