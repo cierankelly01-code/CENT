@@ -24,6 +24,7 @@ const ROUTES = [
   "/configure",
   "/privacy",
   "/staff/login",
+  "/track/CEN-TEST",
 ];
 
 for (const route of ROUTES) {
