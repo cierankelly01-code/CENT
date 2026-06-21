@@ -80,10 +80,12 @@
 .aurora-a { animation: aurora-a 16s ease-in-out infinite; }
 .aurora-b { animation: aurora-b 20s ease-in-out infinite; }
 
-/* Kinetic headline word swap */
+/* Kinetic headline word swap. Reveal via blur + slide only (NOT opacity) so the word is
+   always full-contrast — otherwise axe can catch it mid-fade and flag a colour-contrast
+   violation on the homepage. */
 @keyframes kinetic-in {
-  0% { opacity: 0; transform: translateY(0.4em); filter: blur(4px); }
-  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  0% { transform: translateY(0.4em); filter: blur(4px); }
+  100% { transform: translateY(0); filter: blur(0); }
 }
 .kinetic-word { animation: kinetic-in 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
