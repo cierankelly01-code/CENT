@@ -72,7 +72,7 @@ export default function Nav() {
           <Link
             href="/configure"
             onClick={() => setOpen(false)}
-            className="hidden items-center rounded-full bg-bronze-deep px-5 py-2 font-sans text-sm font-medium text-bone transition-colors hover:bg-[#6f4d29] sm:inline-flex"
+            className="hidden items-center rounded-full bg-bronze-deep px-5 py-2 font-sans text-sm font-medium text-bone transition-colors hover:bg-bronze-deeper sm:inline-flex"
           >
             Configure
           </Link>
@@ -127,7 +127,7 @@ export default function Nav() {
           <Link
             href="/configure"
             onClick={() => setOpen(false)}
-            className="mt-4 inline-flex items-center justify-center rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-medium text-bone transition-colors hover:bg-[#6f4d29]"
+            className="mt-4 inline-flex items-center justify-center rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-medium text-bone transition-colors hover:bg-bronze-deeper"
           >
             Configure
           </Link>

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import MarketingChrome from "@/components/MarketingChrome";
 
-const spaceGrotesk = Space_Grotesk({
+// Display: Fraunces — a refined editorial serif for headlines (premium, warm, human).
+// Body stays Inter for clean, legible running text.
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
@@ -49,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="en-GB" className={`${fraunces.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"

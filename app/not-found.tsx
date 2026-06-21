@@ -23,7 +23,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
             href="/"
-            className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3.5 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29]"
+            className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3.5 font-sans text-base font-semibold text-bone transition-colors hover:bg-bronze-deeper"
           >
             Back to home
           </Link>

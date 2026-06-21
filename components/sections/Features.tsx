@@ -67,7 +67,7 @@ export default function Features() {
             {FEATURES.map((f, i) => (
               <Reveal as="li" key={f.title} delay={(i % 2) * 80}>
                 <article className="group grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-b border-mist py-8 transition-colors sm:py-10">
-                  <span className="font-display text-lg font-semibold text-bronze-deep transition-colors group-hover:text-[#6f4d29]">
+                  <span className="font-display text-lg font-semibold text-bronze-deep transition-colors group-hover:text-bronze-deeper">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <div>

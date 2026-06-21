@@ -286,7 +286,7 @@ export default function ConfigureClient() {
           </p>
           <Link
             href="/"
-            className="mt-8 inline-flex items-center rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29]"
+            className="mt-8 inline-flex items-center rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-bronze-deeper"
           >
             Back to home
           </Link>
@@ -480,12 +480,12 @@ export default function ConfigureClient() {
           </button>
           {step < TOTAL_STEPS - 1 ? (
             <button type="button" onClick={() => canProceed() && setStep((s) => s + 1)} disabled={!canProceed()}
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29] disabled:cursor-not-allowed disabled:opacity-50">
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-bronze-deeper disabled:cursor-not-allowed disabled:opacity-50">
               Continue
             </button>
           ) : (
             <button type="button" onClick={handleSubmit} disabled={submitting}
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29] disabled:cursor-not-allowed disabled:opacity-60">
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-bronze-deeper disabled:cursor-not-allowed disabled:opacity-60">
               {submitting ? "Sending…" : "Send my specification"}
             </button>
           )}

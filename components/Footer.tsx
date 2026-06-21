@@ -23,7 +23,7 @@ export default function Footer() {
           </p>
           <Link
             href="/configure"
-            className="mt-6 inline-flex items-center rounded-full bg-bronze-deep px-5 py-2.5 font-sans text-sm font-semibold text-bone transition-colors hover:bg-[#6f4d29]"
+            className="mt-6 inline-flex items-center rounded-full bg-bronze-deep px-5 py-2.5 font-sans text-sm font-semibold text-bone transition-colors hover:bg-bronze-deeper"
           >
             Configure your Centaur
           </Link>

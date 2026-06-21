@@ -67,7 +67,7 @@ export default function NewsletterSignup() {
           type="button"
           onClick={submit}
           disabled={submitting}
-          className="shrink-0 rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29] disabled:opacity-60"
+          className="shrink-0 rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-bronze-deeper disabled:opacity-60"
         >
           {submitting ? "…" : "Keep me posted"}
         </button>
