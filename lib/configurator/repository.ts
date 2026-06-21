@@ -2,6 +2,7 @@ import "server-only";
 import { getServiceClient } from "./server";
 import { generateRefCandidate, generateToken, hashToken, tokenMatches } from "./refs";
 import { validatePayload } from "./validate";
+import { sendSubmissionEmails } from "./email";
 import {
   emptyBuildPayload,
   toClientBuildConfig,
@@ -162,6 +163,7 @@ export type SubmitBuildInput = {
   customer_name?: unknown;
   customer_email?: unknown;
   customer_phone?: unknown;
+  resume_url?: unknown;
 };
 
 /**
@@ -215,5 +217,11 @@ export async function submitBuild(
   if (error) throw error;
   const updated = data as unknown as BuildConfigRow;
   await logEvent(updated.id, "customer", "submitted", { version: updated.config_version });
+  await sendSubmissionEmails({
+    ref: updated.ref,
+    customerName: customerName,
+    customerEmail: customerEmail,
+    resumeUrl: clean(input.resume_url),
+  });
   return toClientBuildConfig(updated);
 }

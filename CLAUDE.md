@@ -30,6 +30,11 @@ Next.js (App Router) + TypeScript · Tailwind (channel-based CSS-var tokens) · 
 - Lint-clean (`npm run lint`), no hard-coded colours (use Tailwind tokens), responsive 320–1440,
   honour `prefers-reduced-motion`.
 
+## Operating efficiently (token-conservative)
+- Terse narration; short commit messages and PR bodies.
+- Don't re-read files already seen in the session; prefer `grep` over reading whole files.
+- Use a subagent for any big multi-file search.
+
 ## Guardrails (don't cross)
 - No medical/clinical/health claims; no off-road capability claims (smooth-surface positioning only).
 - No invented funding figures, partner names, or trial results — placeholders flagged `CLIENT —` /

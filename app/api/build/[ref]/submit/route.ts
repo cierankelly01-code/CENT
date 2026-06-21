@@ -18,6 +18,7 @@ export async function POST(req: Request, { params }: Ctx): Promise<Response> {
   if (!token) return errorResponse("Missing access token.", 401);
   try {
     const body = await readJsonObject(req);
+    const origin = new URL(req.url).origin;
     const config = await submitBuild(params.ref, token, {
       consent_given: body.consent_given,
       consent_text: body.consent_text,
@@ -25,6 +26,7 @@ export async function POST(req: Request, { params }: Ctx): Promise<Response> {
       customer_name: body.customer_name,
       customer_email: body.customer_email,
       customer_phone: body.customer_phone,
+      resume_url: `${origin}/build/${encodeURIComponent(params.ref)}?t=${encodeURIComponent(token)}`,
     });
     if (!config) return errorResponse("Build not found.", 404);
     return jsonResponse({ config });
