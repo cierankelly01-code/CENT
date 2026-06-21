@@ -5,6 +5,7 @@ import { staffGetBuild, STAFF_BUILD_STATUSES } from "@/lib/configurator/reposito
 import { DEMO_MODE, demoBuildDetail } from "@/lib/admin/demo";
 import { setBuildStatus } from "@/app/staff/actions";
 import StatusSelect from "@/components/staff/StatusSelect";
+import StatusBadge from "@/components/staff/StatusBadge";
 import { buildFieldByKey } from "@/lib/configurator/options";
 import type { BuildConfigPayload } from "@/lib/configurator/types";
 
@@ -48,11 +49,15 @@ export default async function StaffBuildDetail({ params }: { params: { ref: stri
         <div className="flex justify-between gap-4 border-b border-mist/60 py-2">
           <dt className="text-ink/70">Status</dt>
           <dd>
-            <StatusSelect
-              value={build.status}
-              options={STAFF_BUILD_STATUSES}
-              action={setBuildStatus.bind(null, build.ref)}
-            />
+            {DEMO_MODE ? (
+              <StatusBadge status={build.status} />
+            ) : (
+              <StatusSelect
+                value={build.status}
+                options={STAFF_BUILD_STATUSES}
+                action={setBuildStatus.bind(null, build.ref)}
+              />
+            )}
           </dd>
         </div>
         <Row label="Name" value={build.customer_name ?? "—"} />

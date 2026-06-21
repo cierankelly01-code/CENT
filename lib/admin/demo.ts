@@ -1,10 +1,10 @@
 // ───────────────────────────────────────────────────────────────────────────
 // DEMO / SAMPLE DATA — for showing the staff panel before real data exists.
 //
-// HOW TO TURN OFF (go live with real data):
-//   1. Set DEMO_MODE = false below, OR
-//   2. Delete this file and remove the `DEMO_MODE ? demo… : …` branches in the
-//      app/staff/** pages (search the repo for `DEMO_MODE`).
+// Default is OFF (real data) so it can never ship to real customers by accident.
+// TO SHOW THE DEMO: set env var NEXT_PUBLIC_STAFF_DEMO=1 in Vercel and redeploy.
+// TO GO LIVE: remove that env var (or set it to 0); optionally delete this file and
+//   the `DEMO_MODE ? demo… : …` branches in app/staff/** (search for `DEMO_MODE`).
 // Nothing here is written to the database — it's purely presentational. A clear
 // "Sample data" banner shows on every staff page while this is on.
 // ───────────────────────────────────────────────────────────────────────────
@@ -17,8 +17,8 @@ import type {
   BuildConfigEventRow,
 } from "@/lib/configurator/types";
 
-/** Master switch. Set to false to use real data. */
-export const DEMO_MODE: boolean = true;
+/** Master switch — OFF unless NEXT_PUBLIC_STAFF_DEMO=1 (safe default for production). */
+export const DEMO_MODE: boolean = process.env.NEXT_PUBLIC_STAFF_DEMO === "1";
 
 // ── Dashboard ───────────────────────────────────────────────────────────────
 
@@ -102,7 +102,7 @@ export function demoEnquiryById(id: string): EnquiryRow | null {
       "Looking for a chair that lets me sit at eye level at the dinner table and get through our narrow hallway. Keen to try a test drive.",
     config_payload: {
       for_whom: e.enquiry_type === "business" ? "organisation" : "myself",
-      use_cases: ["home", "outdoors"],
+      use_cases: ["home", "pedestrian areas"],
       approx_height: "5'6\"–5'11\"",
       control: "joystick",
       timeframe: "Within 3 months",

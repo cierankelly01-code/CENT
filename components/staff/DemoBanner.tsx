@@ -2,9 +2,9 @@
 export default function DemoBanner() {
   return (
     <div className="border-b border-bronze-deep/20 bg-bronze-deep/10">
-      <div className="container-edge py-2 font-sans text-xs text-bronze-deep">
-        <strong className="font-semibold">Sample data</strong> — this is a demonstration. Real data
-        replaces it when DEMO_MODE is switched off.
+      <div className="container-edge py-2 font-sans text-xs text-ink/80">
+        <strong className="font-semibold text-ink">Sample data</strong> — this is a demonstration.
+        Real data replaces it when demo mode is switched off.
       </div>
     </div>
   );

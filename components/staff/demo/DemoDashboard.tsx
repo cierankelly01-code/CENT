@@ -155,11 +155,11 @@ function RevenueChart() {
         const y = H - pad - h;
         return (
           <g key={m.month}>
-            <rect x={x} y={y} width={w} height={h} rx={4} fill="rgb(140 88 36)" />
-            <text x={x + w / 2} y={H - pad + 14} textAnchor="middle" fontSize="11" fill="rgb(26 23 20 / 0.6)">
+            <rect x={x} y={y} width={w} height={h} rx={4} fill="rgb(var(--color-bronze-deep))" />
+            <text x={x + w / 2} y={H - pad + 14} textAnchor="middle" fontSize="11" fill="rgb(var(--color-ink) / 0.6)">
               {m.month}
             </text>
-            <text x={x + w / 2} y={y - 6} textAnchor="middle" fontSize="10" fill="rgb(26 23 20 / 0.55)">
+            <text x={x + w / 2} y={y - 6} textAnchor="middle" fontSize="10" fill="rgb(var(--color-ink) / 0.55)">
               £{(m.revenue / 1000).toFixed(0)}k
             </text>
           </g>

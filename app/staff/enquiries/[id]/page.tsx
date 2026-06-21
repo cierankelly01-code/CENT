@@ -5,6 +5,7 @@ import { staffGetEnquiry, ENQUIRY_STATUSES } from "@/lib/admin/orders";
 import { DEMO_MODE, demoEnquiryById } from "@/lib/admin/demo";
 import { setEnquiryStatus } from "@/app/staff/actions";
 import StatusSelect from "@/components/staff/StatusSelect";
+import StatusBadge from "@/components/staff/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -48,11 +49,15 @@ export default async function StaffEnquiryDetail({ params }: { params: { id: str
         <div className="flex items-center justify-between gap-4 border-b border-mist/60 py-2">
           <dt className="text-ink/70">Status</dt>
           <dd>
-            <StatusSelect
-              value={enquiry.status}
-              options={ENQUIRY_STATUSES}
-              action={setEnquiryStatus.bind(null, enquiry.id)}
-            />
+            {DEMO_MODE ? (
+              <StatusBadge status={enquiry.status} />
+            ) : (
+              <StatusSelect
+                value={enquiry.status}
+                options={ENQUIRY_STATUSES}
+                action={setEnquiryStatus.bind(null, enquiry.id)}
+              />
+            )}
           </dd>
         </div>
         <Row label="Received" value={new Date(enquiry.created_at).toLocaleString("en-GB")} />
