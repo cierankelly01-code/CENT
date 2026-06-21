@@ -33,6 +33,31 @@ export async function staffListEnquiries(limit?: number): Promise<EnquirySummary
   return (data ?? []) as unknown as EnquirySummary[];
 }
 
+/** Lifecycle statuses staff may set on an enquiry. */
+export const ENQUIRY_STATUSES = [
+  "new",
+  "contacted",
+  "quoted",
+  "test_drive",
+  "ordered",
+  "closed",
+] as const;
+
+/** Staff status change on an enquiry. Returns false if the id doesn't exist. */
+export async function staffUpdateEnquiryStatus(id: string, status: string): Promise<boolean> {
+  if (!(ENQUIRY_STATUSES as readonly string[]).includes(status)) {
+    throw new Error("Invalid enquiry status.");
+  }
+  const { data, error } = await getServiceClient()
+    .from("quote_requests")
+    .update({ status })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
 /** A single enquiry by id. */
 export async function staffGetEnquiry(id: string): Promise<EnquiryRow | null> {
   const { data, error } = await getServiceClient()

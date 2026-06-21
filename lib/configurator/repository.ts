@@ -284,3 +284,30 @@ export async function staffGetBuild(ref: string): Promise<{
     events: (eventsResult.data ?? []) as unknown as BuildConfigEventRow[],
   };
 }
+
+/** Statuses staff may set on a build (never back to draft). */
+export const STAFF_BUILD_STATUSES = [
+  "submitted",
+  "under_review",
+  "quoted",
+  "confirmed",
+  "archived",
+  "abandoned",
+] as const;
+
+/** Staff status change on a build. Returns false if the ref doesn't exist. */
+export async function staffUpdateBuildStatus(ref: string, status: string): Promise<boolean> {
+  if (!(STAFF_BUILD_STATUSES as readonly string[]).includes(status)) {
+    throw new Error("Invalid build status.");
+  }
+  const { data, error } = await getServiceClient()
+    .from("build_configs")
+    .update({ status })
+    .eq("ref", ref)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return false;
+  await logEvent((data as { id: string }).id, "staff", "status_changed", { status });
+  return true;
+}

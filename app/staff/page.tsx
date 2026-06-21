@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffDashboardCounts, staffListEnquiries } from "@/lib/admin/orders";
+import GenerateLink from "@/components/staff/GenerateLink";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,10 @@ export default async function StaffDashboard() {
         <Stat label="New enquiries" value={counts.enquiriesNew} href="/staff/enquiries" />
         <Stat label="Total enquiries" value={counts.enquiriesTotal} href="/staff/enquiries" />
         <Stat label="Submitted builds" value={counts.buildsSubmitted} href="/staff/builds" />
+      </div>
+
+      <div className="mt-8">
+        <GenerateLink />
       </div>
 
       <section className="mt-12">
