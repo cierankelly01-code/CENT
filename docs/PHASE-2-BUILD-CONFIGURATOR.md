@@ -332,6 +332,7 @@ Supabase from the browser. All access is server-side, via Route Handlers under
 | `RESEND_API_KEY` | add in Vercel (server-only) | transactional email on submit. Without it, email is skipped (submit still works). |
 | `RESEND_FROM` | optional | e.g. `Centaur Robotics <hello@centaurrobotics.com>` — TBC until domain verified; defaults to Resend's test sender. |
 | `STAFF_NOTIFY_EMAIL` | optional | where staff submission alerts go; defaults to hello@centaurrobotics.com. |
+| `STAFF_ALLOWED_EMAILS` | optional | comma-separated allowlist for the staff view. When unset, any authenticated Supabase user is staff (MVP — accounts are created manually). Set it to lock access to named addresses. Applied in both middleware and the server gate. |
 
 Endpoints (all Node runtime, `force-dynamic`, capability-token gated):
 `POST /api/build` (create draft → returns `ref` + one-time `token`) ·
