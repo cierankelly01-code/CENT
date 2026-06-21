@@ -1,74 +1,70 @@
 import Link from "next/link";
 import GenerateLink from "@/components/staff/GenerateLink";
 import {
-  demoKpis,
+  IS_LEADERSHIP,
+  demoKpisOps,
+  demoKpisFinance,
   demoMonthly,
   demoPipeline,
   demoActivity,
   demoStock,
   demoIntegrations,
+  type Kpi,
 } from "@/lib/admin/demo";
 
-// Rich, enterprise-style staff dashboard rendered from sample data (DEMO_MODE). Purely
-// presentational — no database access. Real dashboard lives in app/staff/page.tsx.
+// Rich, enterprise-style staff dashboard from sample data (DEMO_MODE). Operational metrics
+// show for everyone; financials are gated to the Leadership role. Purely presentational.
 export default function DemoDashboard() {
   return (
     <div className="container-edge py-12">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">
-            Dashboard
-          </h1>
-          <p className="mt-2 font-sans text-sm text-ink/70">Your business at a glance.</p>
-        </div>
-      </div>
+      <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">Dashboard</h1>
+      <p className="mt-2 font-sans text-sm text-ink/70">Your business at a glance.</p>
 
-      {/* KPIs */}
+      {/* Operational KPIs — everyone */}
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        {demoKpis.map((k) => (
-          <div
-            key={k.label}
-            className="rounded-xl border border-mist/70 bg-bone p-4 shadow-[0_1px_2px_rgba(26,23,20,0.04)]"
-          >
-            <div className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink">
-              {k.value}
-            </div>
-            <div className="mt-1 font-sans text-xs font-medium uppercase tracking-[0.12em] text-ink/55">
-              {k.label}
-            </div>
-            <div className="mt-0.5 font-sans text-xs text-ink/45">{k.sub}</div>
-          </div>
+        {demoKpisOps.map((k) => (
+          <KpiCard key={k.label} k={k} />
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        {/* Revenue chart */}
-        <section className="rounded-xl border border-mist/70 bg-bone p-5">
-          <h2 className="font-display text-lg font-semibold text-ink">Revenue — last 6 months</h2>
-          <RevenueChart />
+      {/* Finance — leadership only */}
+      {IS_LEADERSHIP && (
+        <section className="mt-6 rounded-xl border border-bronze-deep/20 bg-bronze-deep/[0.04] p-5">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-bronze-deep">
+            Leadership · finance
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {demoKpisFinance.map((k) => (
+              <KpiCard key={k.label} k={k} />
+            ))}
+          </div>
+          <div className="mt-5">
+            <h2 className="font-display text-lg font-semibold text-ink">Revenue — last 6 months</h2>
+            <RevenueChart />
+          </div>
         </section>
+      )}
 
-        {/* Generate link */}
-        <div className="flex flex-col gap-6">
-          <GenerateLink />
-          <section className="rounded-xl border border-mist/70 bg-bone p-5">
-            <h2 className="font-display text-lg font-semibold text-ink">Integrations</h2>
-            <ul className="mt-4 space-y-3">
-              {demoIntegrations.map((i) => (
-                <li key={i.name} className="flex items-center justify-between gap-3">
-                  <span>
-                    <span className="font-sans text-sm font-medium text-ink">{i.name}</span>
-                    <span className="ml-2 font-sans text-xs text-ink/55">{i.detail}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-bronze-deep/30 bg-bronze-deep/10 px-2.5 py-0.5 font-sans text-xs font-medium text-bronze-deep">
-                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-bronze-deep" />
-                    {i.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+      {/* Generate link + integrations */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <GenerateLink />
+        <section className="rounded-xl border border-mist/70 bg-bone p-5">
+          <h2 className="font-display text-lg font-semibold text-ink">Integrations</h2>
+          <ul className="mt-4 space-y-3">
+            {demoIntegrations.map((i) => (
+              <li key={i.name} className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="font-sans text-sm font-medium text-ink">{i.name}</span>
+                  <span className="ml-2 font-sans text-xs text-ink/55">{i.detail}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-bronze-deep/30 bg-bronze-deep/10 px-2.5 py-0.5 font-sans text-xs font-medium text-bronze-deep">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-bronze-deep" />
+                  {i.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
 
       {/* Pipeline */}
@@ -94,7 +90,6 @@ export default function DemoDashboard() {
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Activity */}
         <section className="rounded-xl border border-mist/70 bg-bone p-5">
           <h2 className="font-display text-lg font-semibold text-ink">Recent activity</h2>
           <ul className="mt-4 space-y-3">
@@ -107,7 +102,6 @@ export default function DemoDashboard() {
           </ul>
         </section>
 
-        {/* Stock alerts */}
         <section className="rounded-xl border border-mist/70 bg-bone p-5">
           <h2 className="font-display text-lg font-semibold text-ink">Stock alerts</h2>
           <ul className="mt-4 divide-y divide-mist/60">
@@ -131,15 +125,25 @@ export default function DemoDashboard() {
   );
 }
 
+function KpiCard({ k }: { k: Kpi }) {
+  return (
+    <div className="rounded-xl border border-mist/70 bg-bone p-4 shadow-[0_1px_2px_rgba(26,23,20,0.04)]">
+      <div className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink">{k.value}</div>
+      <div className="mt-1 font-sans text-xs font-medium uppercase tracking-[0.12em] text-ink/55">
+        {k.label}
+      </div>
+      <div className="mt-0.5 font-sans text-xs text-ink/45">{k.sub}</div>
+    </div>
+  );
+}
+
 function RevenueChart() {
   const max = Math.max(...demoMonthly.map((m) => m.revenue));
   const W = 600;
   const H = 200;
   const pad = 24;
   const barW = (W - pad * 2) / demoMonthly.length;
-  const summary = demoMonthly
-    .map((m) => `${m.month}: £${(m.revenue / 1000).toFixed(0)}k`)
-    .join(", ");
+  const summary = demoMonthly.map((m) => `${m.month}: £${(m.revenue / 1000).toFixed(0)}k`).join(", ");
 
   return (
     <svg
