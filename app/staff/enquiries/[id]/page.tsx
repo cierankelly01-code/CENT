@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/configurator/staff-auth";
-import { staffGetEnquiry } from "@/lib/admin/orders";
+import { staffGetEnquiry, ENQUIRY_STATUSES } from "@/lib/admin/orders";
+import { setEnquiryStatus } from "@/app/staff/actions";
+import StatusSelect from "@/components/staff/StatusSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +44,16 @@ export default async function StaffEnquiryDetail({ params }: { params: { id: str
         <Row label="Email" value={enquiry.email} />
         <Row label="Phone" value={enquiry.phone ?? "—"} />
         <Row label="Type" value={enquiry.enquiry_type} />
-        <Row label="Status" value={enquiry.status} />
+        <div className="flex items-center justify-between gap-4 border-b border-mist/60 py-2">
+          <dt className="text-ink/70">Status</dt>
+          <dd>
+            <StatusSelect
+              value={enquiry.status}
+              options={ENQUIRY_STATUSES}
+              action={setEnquiryStatus.bind(null, enquiry.id)}
+            />
+          </dd>
+        </div>
         <Row label="Received" value={new Date(enquiry.created_at).toLocaleString("en-GB")} />
       </dl>
 
