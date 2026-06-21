@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BUILD_STEPS,
   optionLabel,
@@ -92,11 +92,16 @@ export default function StudioBuilder({ reference }: { reference: string }) {
     }
   }, [hydrated, step, selections, multi, freeText, storageKey]);
 
-  // Apply a server-loaded config to local state (used on resume).
+  // Apply a server-loaded config to local state (used on resume). Advances to the server's
+  // saved step if it's further along (so a fresh device resumes where the customer left off),
+  // but never rewinds past local progress.
   const applyServer = useCallback((a: ClientAnswers) => {
     setSelections(a.selections);
     setMulti(a.multi);
     setFreeText(a.freeText);
+    if (typeof a.lastStep === "number") {
+      setStep((prev) => Math.min(Math.max(prev, a.lastStep ?? 0), REVIEW_STEP));
+    }
   }, []);
 
   // Server load (resume) + debounced autosave, when opened via a capability link (?t=).
@@ -365,19 +370,24 @@ function useBuildSync({
     if (!loaded || !token) return;
     setState("saving");
     const payload = toPayload({ selections, multi, freeText, lastStep: step });
+    const controller = new AbortController();
     const id = setTimeout(async () => {
       try {
         const res = await fetch(`/api/build/${encodeURIComponent(reference)}`, {
           method: "PATCH",
           headers: { "content-type": "application/json", "x-build-token": token },
           body: JSON.stringify({ config_payload: payload }),
+          signal: controller.signal,
         });
         setState(res.ok ? "saved" : "error");
-      } catch {
-        setState("error");
+      } catch (err) {
+        if ((err as Error)?.name !== "AbortError") setState("error");
       }
     }, 800);
-    return () => clearTimeout(id);
+    return () => {
+      clearTimeout(id);
+      controller.abort();
+    };
   }, [loaded, token, selections, multi, freeText, step, reference, setState]);
 }
 
