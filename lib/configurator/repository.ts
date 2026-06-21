@@ -9,6 +9,7 @@ import {
   type BuildConfigRow,
   type BuildConfigEventRow,
   type BuildConfigVersionRow,
+  type BuildStatus,
   type ClientBuildConfig,
 } from "./types";
 
@@ -61,6 +62,25 @@ async function getVerifiedRow(ref: string, token: string): Promise<BuildConfigRo
   const row = data as unknown as BuildConfigRow;
   if (!tokenMatches(token, row.access_token_hash)) return null;
   return row;
+}
+
+export type BuildTracking = {
+  ref: string;
+  status: BuildStatus;
+  submitted_at: string | null;
+  customer_name: string | null;
+};
+
+/** Customer-facing, token-gated status read for the order-tracking page. */
+export async function trackByRef(ref: string, token: string): Promise<BuildTracking | null> {
+  const row = await getVerifiedRow(ref, token);
+  if (!row) return null;
+  return {
+    ref: row.ref,
+    status: row.status,
+    submitted_at: row.submitted_at,
+    customer_name: row.customer_name,
+  };
 }
 
 export type CreateDraftInput = {
