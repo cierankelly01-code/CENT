@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffListBuilds, type StaffBuildSummary } from "@/lib/configurator/repository";
+import { DEMO_MODE, demoBuilds } from "@/lib/admin/demo";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ const COLUMNS: { key: string; label: string; match: (s: string) => boolean }[] =
 
 export default async function StaffPipeline() {
   await requireStaff();
-  const builds = await staffListBuilds();
+  const builds = DEMO_MODE ? demoBuilds : await staffListBuilds();
 
   return (
     <div className="container-edge py-12">

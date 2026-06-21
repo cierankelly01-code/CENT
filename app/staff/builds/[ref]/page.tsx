@@ -2,8 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffGetBuild, STAFF_BUILD_STATUSES } from "@/lib/configurator/repository";
+import { DEMO_MODE, demoBuildDetail } from "@/lib/admin/demo";
 import { setBuildStatus } from "@/app/staff/actions";
 import StatusSelect from "@/components/staff/StatusSelect";
+import StatusBadge from "@/components/staff/StatusBadge";
 import { buildFieldByKey } from "@/lib/configurator/options";
 import type { BuildConfigPayload } from "@/lib/configurator/types";
 
@@ -26,7 +28,7 @@ function specRows(payload: BuildConfigPayload) {
 
 export default async function StaffBuildDetail({ params }: { params: { ref: string } }) {
   await requireStaff();
-  const data = await staffGetBuild(params.ref);
+  const data = DEMO_MODE ? demoBuildDetail(params.ref) : await staffGetBuild(params.ref);
   if (!data) notFound();
   const { build, versions, events } = data;
   const rows = specRows(build.config_payload);
@@ -47,11 +49,15 @@ export default async function StaffBuildDetail({ params }: { params: { ref: stri
         <div className="flex justify-between gap-4 border-b border-mist/60 py-2">
           <dt className="text-ink/70">Status</dt>
           <dd>
-            <StatusSelect
-              value={build.status}
-              options={STAFF_BUILD_STATUSES}
-              action={setBuildStatus.bind(null, build.ref)}
-            />
+            {DEMO_MODE ? (
+              <StatusBadge status={build.status} />
+            ) : (
+              <StatusSelect
+                value={build.status}
+                options={STAFF_BUILD_STATUSES}
+                action={setBuildStatus.bind(null, build.ref)}
+              />
+            )}
           </dd>
         </div>
         <Row label="Name" value={build.customer_name ?? "—"} />
