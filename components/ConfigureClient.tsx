@@ -233,6 +233,19 @@ export default function ConfigureClient() {
           config_payload,
         });
       if (error) throw error;
+      // Fire-and-forget: instant acknowledgement to the enquirer + staff alert. Never blocks
+      // the success state, and failures are swallowed (the lead is already saved).
+      void fetch("/api/enquiry/notify", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          enquiry_type: forWhom === "organisation" ? "business" : "personal",
+          message: needs.trim() || null,
+        }),
+      }).catch(() => {});
       try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
       setDone(true);
     } catch (err) {
