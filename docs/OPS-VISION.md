@@ -55,7 +55,7 @@ the whole business from one place. It builds in stages on the seam already in pl
 - **Accessibility & dignity** (this is a disability company): every touchpoint — *including the staff tools* — exemplary-accessible (WCAG 2.2 AA+, keyboard, screen reader, plain language, reduced motion); needs captured without feeling medical; accessibility as a brand differentiator, ideally co-designed with real users.
 
 ## Phased roadmap (each stage usable on its own)
-1. **Admin shell (now)** — login, dashboard, unified inbox (enquiries + builds), order detail, status pipeline, generate-customer-link.
+1. **Admin shell (now)** — login, dashboard, unified inbox (enquiries + builds), order detail. *(Next: status editing + generate-customer-link.)*
 2. **Quoting & pricing** — BOM mapping → quote + ETA + margin; deposits (Stripe).
 3. **Inventory, suppliers & POs** — stock, reorder points, procurement.
 4. **Production & fulfilment** — work orders, QA gates, traceability, delivery/install.

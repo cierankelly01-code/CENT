@@ -27,7 +27,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-ink/70 transition-colors hover:text-ink"
+                className="text-ink/70 transition-colors hover:text-ink motion-reduce:transition-none"
               >
                 {item.label}
               </Link>

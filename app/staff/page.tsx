@@ -6,11 +6,10 @@ export const dynamic = "force-dynamic";
 
 export default async function StaffDashboard() {
   await requireStaff();
-  const [counts, enquiries] = await Promise.all([
+  const [counts, recent] = await Promise.all([
     staffDashboardCounts(),
-    staffListEnquiries(),
+    staffListEnquiries(6),
   ]);
-  const recent = enquiries.slice(0, 6);
 
   return (
     <div className="container-edge py-12">
@@ -41,7 +40,7 @@ export default async function StaffDashboard() {
               <li key={e.id}>
                 <Link
                   href={`/staff/enquiries/${e.id}`}
-                  className="flex items-center justify-between gap-4 py-3 font-sans text-sm transition-colors hover:bg-mist/20"
+                  className="flex items-center justify-between gap-4 py-3 font-sans text-sm transition-colors hover:bg-mist/20 motion-reduce:transition-none"
                 >
                   <span className="font-medium text-ink">{e.name}</span>
                   <span className="text-ink/60">{e.enquiry_type}</span>
@@ -63,7 +62,7 @@ function Stat({ label, value, href }: { label: string; value: number; href: stri
   return (
     <Link
       href={href}
-      className="rounded-xl border border-mist/70 bg-bone p-5 transition-colors hover:border-bronze-deep/50"
+      className="rounded-xl border border-mist/70 bg-bone p-5 transition-colors hover:border-bronze-deep/50 motion-reduce:transition-none"
     >
       <div className="font-display text-4xl font-semibold tracking-[-0.02em] text-ink">{value}</div>
       <div className="mt-1 font-sans text-sm text-ink/70">{label}</div>

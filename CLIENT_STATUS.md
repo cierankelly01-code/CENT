@@ -57,7 +57,7 @@ To finish the website and get it launch-ready, we need:
 - Your logo (as an SVG file)
 - Real product photos or 3D model (`.glb` file) for the hero section
 - Customer testimonials (with names and permission to use them)
-- Approval on the founder story section we've drafted
+- Approval on the founder story section we've drafted (currently flagged **PENDING FOUNDER SIGN-OFF** and held back until approved)
 - Sources for any market stats we've quoted
 
 **Business Details**
@@ -105,8 +105,8 @@ Once we've set up your systems, staff will be able to log in and generate privat
 
 ### Ongoing (Every Time You Send a Customer a Link)
 
-6. **Generate a customer link**  
-   A staff member logs into the control panel → clicks "generate link" → copies the link → sends it to the customer. Done. Customer configures their chair, submits, and you get the data in your inbox.
+6. **Generate a customer link** *(feature coming next — being built now)*  
+   A staff member will log into the control panel → click "generate link" → copy the link → send it to the customer. The customer configures their chair, submits, and the details land in your inbox. *(Until that button ships, we can generate a link for you on request.)*
 
 ---
 

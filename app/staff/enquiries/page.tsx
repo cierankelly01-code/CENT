@@ -12,7 +12,7 @@ export default async function StaffEnquiries() {
     <div className="container-edge py-12">
       <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">Enquiries</h1>
       <p className="mt-2 font-sans text-sm text-ink/70">
-        {enquiries.length} enquiry(ies) from the website form.
+        {enquiries.length} {enquiries.length === 1 ? "enquiry" : "enquiries"} from the website form.
       </p>
 
       {enquiries.length === 0 ? (

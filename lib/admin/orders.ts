@@ -21,12 +21,14 @@ export type EnquirySummary = Pick<
   "id" | "created_at" | "name" | "email" | "phone" | "enquiry_type" | "status"
 >;
 
-/** All enquiries, newest first. */
-export async function staffListEnquiries(): Promise<EnquirySummary[]> {
-  const { data, error } = await getServiceClient()
+/** Enquiries, newest first. Pass a limit for the dashboard's recent list. */
+export async function staffListEnquiries(limit?: number): Promise<EnquirySummary[]> {
+  let query = getServiceClient()
     .from("quote_requests")
     .select("id,created_at,name,email,phone,enquiry_type,status")
     .order("created_at", { ascending: false });
+  if (typeof limit === "number") query = query.limit(limit);
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as unknown as EnquirySummary[];
 }
