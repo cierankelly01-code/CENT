@@ -7,8 +7,15 @@ import {
   emptyBuildPayload,
   toClientBuildConfig,
   type BuildConfigRow,
+  type BuildConfigEventRow,
+  type BuildConfigVersionRow,
   type ClientBuildConfig,
 } from "./types";
+
+export type StaffBuildSummary = Pick<
+  BuildConfigRow,
+  "ref" | "customer_name" | "customer_email" | "status" | "submitted_at" | "created_at" | "config_version"
+>;
 
 // Data-access layer for the build configurator. Every read/write goes through here, and
 // every customer-scoped operation is gated by a capability-token check (getVerifiedRow).
@@ -224,4 +231,54 @@ export async function submitBuild(
     resumeUrl: clean(input.resume_url),
   });
   return toClientBuildConfig(updated);
+}
+
+// --- Staff reads (service role; callers must be authenticated staff) --------
+
+/** All non-draft builds, newest submission first. */
+export async function staffListBuilds(): Promise<StaffBuildSummary[]> {
+  const { data, error } = await getServiceClient()
+    .from("build_configs")
+    .select("ref,customer_name,customer_email,status,submitted_at,created_at,config_version")
+    .neq("status", "draft")
+    .order("submitted_at", { ascending: false, nullsFirst: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as StaffBuildSummary[];
+}
+
+/** A single build with its full version history and recent event log. */
+export async function staffGetBuild(ref: string): Promise<{
+  build: BuildConfigRow;
+  versions: BuildConfigVersionRow[];
+  events: BuildConfigEventRow[];
+} | null> {
+  const supabase = getServiceClient();
+  const { data: row, error } = await supabase
+    .from("build_configs")
+    .select("*")
+    .eq("ref", ref)
+    .maybeSingle();
+  if (error) throw error;
+  if (!row) return null;
+  const build = row as unknown as BuildConfigRow;
+
+  const [{ data: versions }, { data: events }] = await Promise.all([
+    supabase
+      .from("build_config_versions")
+      .select("*")
+      .eq("build_config_id", build.id)
+      .order("version", { ascending: false }),
+    supabase
+      .from("build_config_events")
+      .select("*")
+      .eq("build_config_id", build.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
+
+  return {
+    build,
+    versions: (versions ?? []) as unknown as BuildConfigVersionRow[],
+    events: (events ?? []) as unknown as BuildConfigEventRow[],
+  };
 }

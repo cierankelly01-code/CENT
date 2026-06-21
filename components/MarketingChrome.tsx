@@ -13,9 +13,13 @@ import ScrollProgress from "@/components/ScrollProgress";
  */
 export default function MarketingChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isStudio = pathname === "/build" || pathname?.startsWith("/build/") === true;
+  const standalone =
+    pathname === "/build" ||
+    pathname?.startsWith("/build/") === true ||
+    pathname === "/staff" ||
+    pathname?.startsWith("/staff/") === true;
 
-  if (isStudio) return <>{children}</>;
+  if (standalone) return <>{children}</>;
 
   return (
     <>
