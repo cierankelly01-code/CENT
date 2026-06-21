@@ -22,7 +22,7 @@ export default function HeroBuy() {
         />
       </div>
 
-      <div className="container-edge relative grid items-center gap-10 pb-16 pt-28 md:pb-24 md:pt-32 lg:min-h-[92vh] lg:grid-cols-[1.05fr_1fr] lg:gap-8">
+      <div className="container-edge relative grid items-center gap-10 pb-16 pt-20 md:pb-24 md:pt-24 lg:min-h-[92vh] lg:grid-cols-[1.05fr_1fr] lg:gap-8">
         {/* Copy */}
         <Reveal className="order-2 lg:order-1">
           <span className="inline-flex items-center gap-2 font-sans text-xs font-semibold uppercase tracking-[0.18em] text-bronze-deep">
