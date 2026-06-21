@@ -23,10 +23,17 @@ type PersistedState = {
   selections?: Record<string, string>;
   multi?: Record<string, string[]>;
   freeText?: Record<string, string>;
+  contact?: { name?: string; email?: string; phone?: string };
 };
 
 const REVIEW_STEP = BUILD_STEPS.length;
 const TOTAL_STEPS = BUILD_STEPS.length + 1; // + review
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Exact UK GDPR consent wording shown to the customer — recorded verbatim with the submission.
+const CONSENT_TEXT =
+  "I agree that Centaur Robotics can use the details and specification I’ve provided to contact me about my Centaur build and prepare a tailored quote. We never share your data.";
 
 function isStringRecord(v: unknown): v is Record<string, string> {
   return (
@@ -62,7 +69,22 @@ export default function StudioBuilder({ reference }: { reference: string }) {
   const [multi, setMulti] = useState<MultiSel>({});
   const [freeText, setFreeText] = useState<FreeText>({});
   const [hydrated, setHydrated] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  // Capability token (from the link) — needed to load, autosave and submit server-side.
+  const [token, setToken] = useState<string | null>(null);
+  useEffect(() => {
+    setToken(new URLSearchParams(window.location.search).get("t"));
+  }, []);
+
+  // Contact + consent (collected on the review step: light email gate + submit).
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
 
   // Restore on mount — validate the persisted shape before trusting it.
   useEffect(() => {
@@ -74,6 +96,11 @@ export default function StudioBuilder({ reference }: { reference: string }) {
         if (isStringArrayRecord(s.multi)) setMulti(s.multi);
         if (isStringRecord(s.freeText)) setFreeText(s.freeText);
         if (typeof s.step === "number") setStep(Math.min(Math.max(0, s.step), REVIEW_STEP));
+        if (s.contact) {
+          if (typeof s.contact.name === "string") setName(s.contact.name);
+          if (typeof s.contact.email === "string") setEmail(s.contact.email);
+          if (typeof s.contact.phone === "string") setPhone(s.contact.phone);
+        }
       }
     } catch {
       /* ignore malformed storage */
@@ -86,11 +113,14 @@ export default function StudioBuilder({ reference }: { reference: string }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ step, selections, multi, freeText }));
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ step, selections, multi, freeText, contact: { name, email, phone } })
+      );
     } catch {
       /* ignore quota/availability errors — server sync is the durable store */
     }
-  }, [hydrated, step, selections, multi, freeText, storageKey]);
+  }, [hydrated, step, selections, multi, freeText, name, email, phone, storageKey]);
 
   // Apply a server-loaded config to local state (used on resume). Advances to the server's
   // saved step if it's further along (so a fresh device resumes where the customer left off),
@@ -105,7 +135,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
   }, []);
 
   // Server load (resume) + debounced autosave, when opened via a capability link (?t=).
-  useBuildSync({ reference, hydrated, selections, multi, freeText, step, applyServer });
+  useBuildSync({ reference, token, hydrated, selections, multi, freeText, step, applyServer });
 
   const setSingle = (key: string, code: string) =>
     setSelections((prev) => ({ ...prev, [key]: code }));
@@ -139,6 +169,59 @@ export default function StudioBuilder({ reference }: { reference: string }) {
     setStep((s) => Math.max(0, s - 1));
   }
 
+  async function handleSubmit() {
+    setSubmitError(null);
+    const e: Record<string, string> = {};
+    if (!email.trim()) e.email = "Please enter your email.";
+    else if (!EMAIL_RE.test(email.trim())) e.email = "Enter a valid email address.";
+    if (!consent) e.consent = "Please agree so we can contact you about your build.";
+    setErrors(e);
+    if (Object.keys(e).length) {
+      document.getElementById(`bf-${Object.keys(e)[0]}`)?.focus();
+      return;
+    }
+    if (!token) {
+      setSubmitError(
+        "This build link is missing its access token — please open the original link we sent you."
+      );
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const payload = toPayload({ selections, multi, freeText, lastStep: step });
+      const res = await fetch(`/api/build/${encodeURIComponent(reference)}/submit`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-build-token": token },
+        body: JSON.stringify({
+          consent_given: true,
+          consent_text: CONSENT_TEXT,
+          config_payload: payload,
+          customer_name: name.trim() || null,
+          customer_email: email.trim(),
+          customer_phone: phone.trim() || null,
+        }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "submit failed");
+      }
+      try {
+        localStorage.removeItem(storageKey);
+      } catch {
+        /* ignore */
+      }
+      setDone(true);
+    } catch (err) {
+      setSubmitError(
+        "We couldn’t send your specification. Please try again, or email hello@centaurrobotics.com."
+      );
+      // eslint-disable-next-line no-console
+      console.error("build submit failed:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   // Build review rows from every visible, answered field, each linking back to its step.
   const reviewRows: { id: string; label: string; value: string; step: number }[] = [];
   BUILD_STEPS.forEach((def, i) => {
@@ -166,6 +249,28 @@ export default function StudioBuilder({ reference }: { reference: string }) {
 
   const current: BuildStep | undefined = BUILD_STEPS[step];
   const progressPct = Math.round(((step + 1) / TOTAL_STEPS) * 100);
+
+  if (done) {
+    return (
+      <div className="container-edge py-20 md:py-28">
+        <div className="mx-auto max-w-xl text-center">
+          <p className="eyebrow">Specification received</p>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-[-0.02em] text-ink sm:text-4xl">
+            Thank you{name.trim() ? `, ${name.trim().split(" ")[0]}` : ""}.
+          </h1>
+          <p className="mt-4 font-sans text-lg leading-relaxed text-ink/70">
+            We’ve received your Centaur specification under reference{" "}
+            <span className="font-medium text-ink">{reference}</span>. A member of the team will
+            review it and be in touch to talk it through, prepare your tailored quote and arrange a
+            test drive.
+          </p>
+          <p className="mt-4 font-sans text-sm text-ink/70">
+            We’ve sent a copy to <span className="font-medium text-ink">{email.trim()}</span>.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container-edge py-12 md:py-16">
@@ -260,14 +365,68 @@ export default function StudioBuilder({ reference }: { reference: string }) {
                 </ol>
               </div>
 
-              {saved && (
-                <p
-                  role="status"
-                  className="rounded-md border border-bronze-deep/30 bg-bronze/10 px-4 py-3 font-sans text-sm text-bronze-deep"
-                >
-                  Saved. You can close this and return any time using your link.
+              <div className="space-y-5">
+                <p className="font-sans text-base font-medium text-ink">
+                  Where should we send your quote?
                 </p>
-              )}
+                <TextInput
+                  id="bf-name"
+                  label="Name"
+                  value={name}
+                  onChange={setName}
+                  autoComplete="name"
+                />
+                <TextInput
+                  id="bf-email"
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={setEmail}
+                  error={errors.email}
+                  required
+                  autoComplete="email"
+                />
+                <TextInput
+                  id="bf-phone"
+                  label="Phone (optional)"
+                  type="tel"
+                  value={phone}
+                  onChange={setPhone}
+                  autoComplete="tel"
+                />
+
+                <div>
+                  <label className="flex items-start gap-3 font-sans text-sm text-ink/70">
+                    <input
+                      id="bf-consent"
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(ev) => setConsent(ev.target.checked)}
+                      aria-describedby={errors.consent ? "bf-consent-error" : undefined}
+                      className="mt-1 h-4 w-4 accent-bronze-deep"
+                    />
+                    <span>{CONSENT_TEXT}</span>
+                  </label>
+                  {errors.consent && (
+                    <p
+                      id="bf-consent-error"
+                      role="alert"
+                      className="mt-2 font-sans text-sm text-bronze-deep"
+                    >
+                      {errors.consent}
+                    </p>
+                  )}
+                </div>
+
+                {submitError && (
+                  <p
+                    role="alert"
+                    className="rounded-md border border-bronze-deep/40 bg-bronze/10 px-4 py-3 font-sans text-sm text-bronze-deep"
+                  >
+                    {submitError}
+                  </p>
+                )}
+              </div>
             </Step>
           )}
         </div>
@@ -294,10 +453,11 @@ export default function StudioBuilder({ reference }: { reference: string }) {
           ) : (
             <button
               type="button"
-              onClick={() => setSaved(true)}
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors motion-reduce:transition-none hover:bg-bronze-deeper"
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3 font-sans text-base font-semibold text-bone transition-colors motion-reduce:transition-none hover:bg-bronze-deeper disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save my progress
+              {submitting ? "Sending…" : "Send my specification"}
             </button>
           )}
         </div>
@@ -316,6 +476,7 @@ export default function StudioBuilder({ reference }: { reference: string }) {
  */
 function useBuildSync({
   reference,
+  token,
   hydrated,
   selections,
   multi,
@@ -324,6 +485,7 @@ function useBuildSync({
   applyServer,
 }: {
   reference: string;
+  token: string | null;
   hydrated: boolean;
   selections: Record<string, string>;
   multi: Record<string, string[]>;
@@ -332,13 +494,7 @@ function useBuildSync({
   applyServer: (answers: ClientAnswers) => void;
 }) {
   const { setState } = useStudioStatus();
-  const [token, setToken] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
-
-  // Read the capability token from the URL (avoids a Suspense boundary).
-  useEffect(() => {
-    setToken(new URLSearchParams(window.location.search).get("t"));
-  }, []);
 
   // Load the server copy once local hydration has happened.
   useEffect(() => {
@@ -627,5 +783,52 @@ function Select({
         </option>
       ))}
     </select>
+  );
+}
+
+function TextInput({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  type = "text",
+  required,
+  autoComplete,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  type?: string;
+  required?: boolean;
+  autoComplete?: string;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block font-sans text-base font-medium text-ink">
+        {label}
+        {required && <span className="text-bronze-deep"> *</span>}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        required={required}
+        autoComplete={autoComplete}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full rounded-md border bg-bone px-4 py-3 font-sans text-base text-ink placeholder:text-ink/40 ${
+          error ? "border-bronze-deep" : "border-mist"
+        }`}
+      />
+      {error && (
+        <p id={`${id}-error`} role="alert" className="mt-2 font-sans text-sm text-bronze-deep">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
