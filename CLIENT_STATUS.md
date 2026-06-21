@@ -1,133 +1,178 @@
-# Centaur Robotics Website & Operations System — Project Status
+# Centaur Robotics Marketing Site & Build System — Status & Go-Live Guide
 
-**From:** Cieran (your agency)  
-**To:** Julian (Centaur Robotics)  
-**Date:** June 2026
+**Status:** Ready to launch. Core platform is built and live. Five setup steps unlock full lead capture and customer order tracking.
 
 ---
 
 ## What's Live Right Now
 
-Your website is live and working beautifully. Customers can:
+The entire marketing website and customer configurator are deployed and working.
 
-- **Browse the full site:** home page, product details, your story, who it's for, and team info.
-- **Fill out an enquiry form** to request more info or book a test drive — leads go straight to your inbox.
-- **Use the Build Studio:** a private link lets customers fully configure their Centaur chair (seat height, colours, materials, accessories). Once they submit, you get the configuration details automatically.
+**The Website** — customers see:
+- Home page, product showcase, founder story, audience guide, company values, news & events, and privacy statement
+- A lightweight enquiry form where prospects request information
+- Responsive design from phones to desktops, optimised for search engines (Google rich results), and built to WCAG accessibility standards
 
-**Recent polish we shipped:** better search results on Google, faster images, a branded preview image (what shows when the site is shared on WhatsApp or LinkedIn), and "add to home screen" for mobile users.
+**The Configurator (Build Studio)** — customers can:
+- Step through a guided builder to fully specify their Centaur (seat height, control options, materials, colours, accessories)
+- Save their choices automatically as they go
+- Submit their spec with one click
+- Receive an instant confirmation email
 
----
+**The Staff Control Panel** — your team can:
+- See a dashboard with live counts of enquiries, builds, and customer orders
+- Search and filter enquiries by customer, date, or status
+- Access a full list of all customer builds and their current stage
+- Click through to each customer's order detail to read their spec and update status (e.g., received → reviewing → quoted → confirmed)
+- View a visual Pipeline board showing all orders by stage at a glance
+- Generate a unique private link and send it to any customer to start building their chair
 
-## The Next Layer: Your Control Panel (In Progress)
+**Customer Order Tracking** — when customers get their build link, they also get a private tracking page where they can watch their order move along a friendly status timeline (received → reviewing → quoted → confirmed). More stages (in production, delivered) arrive with the operations system later.
 
-We're building a staff dashboard — a secure login area for you and your team to:
-
-- **See new orders overnight:** every enquiry and submitted Build Studio configuration appears in your inbox.
-- **Manage the sales flow:** mark leads as contacted, quoted, sent to test drive, confirmed, etc.
-- **View full order details:** everything the customer configured, all in one place.
-
-This is the foundation of your operations system. Once it's solid, we'll expand it.
-
----
-
-## The Full Vision: Your Operations System (Coming Later)
-
-Imagine logging in once and running your whole business from one place.
-
-- **Sales:** see the pipeline (new leads → quoted → test-driven → ordered), auto-generated price quotes, delivery estimates.
-- **Stock:** real-time visibility into parts inventory, automatic alerts when stock runs low, purchase order management.
-- **Customers:** manage contact info, order history, service history in one place.
-- **Owners' dashboard:** pipeline overview, revenue forecast, stock alerts, and key business metrics at a glance.
-
-We're building this in stages. Your admin panel is stage one; the full system comes next.
+**Polish & Discovery** — we've added:
+- A branded image that appears when customers share the link on WhatsApp, LinkedIn, or via email
+- Faster image loading, optimised fonts, and "add to home screen" for mobile phones
+- Deep search optimisation so Google can show rich snippets (FAQs, organisation and product data)
 
 ---
 
-## Security
+## Awaiting Your Approval (Built & Ready, Not Yet Public)
 
-Your staff login is hardened and encrypted. Only your team can access customer data. The system is built for a disability product, so security and privacy matter as much as they do to us.
+Two design enhancements are built and waiting for your sign-off:
 
----
+- **A more premium look:** elegant serif headlines paired with the current sans-serif body text, plus a richer accent colour throughout the site. It feels slightly more luxury while staying clean and professional.
+- **A reassurance line under the buttons:** "No payment, no commitment — and a test drive when you're ready." It sets customer expectations and reduces friction on the enquiry form and configurator submit.
 
-## What We're Waiting For (From You)
-
-To finish the website and get it launch-ready, we need:
-
-**Visual & Content**
-- Your logo (as an SVG file)
-- Real product photos or 3D model (`.glb` file) for the hero section
-- Customer testimonials (with names and permission to use them)
-- Approval on the founder story section we've drafted (currently flagged **PENDING FOUNDER SIGN-OFF** and held back until approved)
-- Sources for any market stats we've quoted
-
-**Business Details**
-- Real privacy policy wording (we have a template)
-- Company legal details: registered name, company number, office address, phone, support email
-
-**Product Configuration**
-- The exact questions & options you want customers to choose from in the Build Studio
-- Confirmed specs: charge time, battery range, weight, dimensions (pricing stays off the public site — it lives in the staff system)
-- Real news items & publication dates (for your News section)
-
-**For the Full Operations System (Next Phase)**
-- Your pricing structure
-- Full parts lists and suppliers with lead times
+Once you approve these, they go live immediately.
 
 ---
 
-## One Issue to Fix Before Launch
+## What We Need from Centaur (Client Inputs)
 
-**⚠️ SSL Certificate (Security Certificate)**  
-Your domain centaurrobotics.com is currently showing a security warning in browsers (the certificate expired). The site itself works fine on a backup address, but customers will see a warning. This needs fixing in your hosting settings before launch — it's a straightforward fix in the Vercel dashboard.
+To finish the site and make it truly yours, please supply:
 
----
+**Visual assets:**
+- Real company logo (SVG format)
+- Product photos (hi-res) or 3D model (.glb) or hero product video
+- Customer testimonials (real quotes + names + permission to display)
 
-## How to Get Your Customer Configurator Links Live
+**Content & copy:**
+- Sign-off on the founder story (currently held back pending your sign-off)
+- Sources for the market statistics we quote ("1.2m wheelchair users in the UK," etc.) so we can cite them
+- Real company news items and event dates
+- The real privacy policy text (we have a template placeholder)
 
-Once we've set up your systems, staff will be able to log in and generate private Build Studio links to send to customers. Here's the one-time setup checklist:
+**Build Configurator specifics:**
+- The complete list of seat sizes, control options, upholstery finishes, and accessories customers can choose from
+- For each option: the customer-facing label, an internal part code, and whether it's standard or a paid extra
+- Any rules (e.g., "option X only works with Y")
+- Confirmation of specs marked `~` in the current spec (charge time, battery chemistry and capacity)
 
-### One-Time Setup (Do Once)
-
-1. **Fix the SSL certificate**  
-   Log in to Vercel → go to your domain settings (centaurrobotics.com) → renew the certificate. Browsers will stop showing warnings immediately.
-
-2. **Add the secret keys in Vercel**  
-   We'll give you two keys (a database key and an email-sending key). Add them to your Vercel environment settings. This takes 5 minutes.
-
-3. **Run the database setup**  
-   We'll provide a script. Run it once in Supabase (your database service). It creates the tables for orders and configurations. Takes 2 minutes.
-
-4. **Create staff login accounts**  
-   In Supabase, we'll set up login accounts for everyone who needs access (you, your team, etc.). Each person gets their own secure login.
-
-5. **Verify your email domain**  
-   Set up domain verification so confirmation emails send from hello@centaurrobotics.com (instead of a generic address). Instructions come from Supabase; takes 10 minutes.
-
-### Ongoing (Every Time You Send a Customer a Link)
-
-6. **Generate a customer link** *(feature coming next — being built now)*  
-   A staff member will log into the control panel → click "generate link" → copy the link → send it to the customer. The customer configures their chair, submits, and the details land in your inbox. *(Until that button ships, we can generate a link for you on request.)*
+**Legal & compliance:**
+- Company registered name and number
+- Registered office address
+- Support phone number and email address
 
 ---
 
-## Premium Design Updates (Awaiting Approval)
+## One Known Issue — Quick Fix Before Launch
 
-We've designed two polishes:
-
-- **New typography:** elegant serif fonts for headlines, giving the site a more premium feel.
-- **Richer colour:** a deeper accent colour for buttons and highlights.
-
-These are ready to ship — just waiting for your nod to go live.
+The custom domain `centaurrobotics.com` currently shows a browser security warning because the SSL certificate expired. The site itself is fine — customers can use the backup address (`centaurrobotics1.vercel.app`) without any warning, and we can fix the custom domain in about 5 minutes once you give the word.
 
 ---
 
-## A Reassurance Line
+## Five Steps to Go Live (One-Time Setup)
 
-We're also adding a small line under buttons: **"No payment, no commitment — and a test drive when you're ready."** This reassures customers they're not locked in. Ready to ship once you approve.
+Follow these in order. We will provide all the secret keys marked **[we provide]**.
+
+### Step 1: Fix the SSL Certificate (5 min)
+1. Log in to the Vercel Dashboard
+2. Go to Domains → `centaurrobotics.com` → renew the SSL certificate
+3. Test the link in a browser — the warning should vanish
+
+### Step 2: Add Secret Keys in Vercel (10 min)
+1. Log in to the Vercel Dashboard
+2. Go to Settings → Environment Variables
+3. Add these three variables:
+   - `SUPABASE_SERVICE_ROLE_KEY` = **[we provide]**
+   - `RESEND_API_KEY` = **[we provide]**
+   - `NEXT_PUBLIC_SITE_URL` = `https://centaurrobotics.com`
+4. Save and redeploy
+
+### Step 3: Run the Database Setup (5 min, one time only)
+1. Log in to Supabase
+2. Go to SQL Editor
+3. Paste and run the SQL script from `supabase/build-schema.sql`
+4. This creates the tables for customer builds and enquiries
+
+### Step 4: Create Staff Login Accounts (2 min per person, ongoing)
+1. In Supabase, create a user account for each team member who needs staff panel access (email + password)
+2. They log in at `/staff` with those credentials
+3. *Optional:* We can restrict login to only your company email domain (e.g., @centaurrobotics.com only)
+
+### Step 5: Verify the Email-Sending Domain (10 min)
+1. Log in to Resend Dashboard
+2. Go to Domains → add and verify `hello@centaurrobotics.com`
+3. Once verified, all build confirmations and enquiry receipts will send from that address
+
+**That's it.** Once you finish these five steps, the whole system is live and ready for real customers.
+
+---
+
+## How to Send a Customer Their Configurator Link (Repeat Per Customer)
+
+Once setup is complete, here's the daily workflow:
+
+1. **Log in to the staff panel** at `yoursite.com/staff`
+2. **Click the "Generate customer link" button** — it creates a unique private link for that customer
+3. **Copy the link** and send it to them (email, WhatsApp, text — your choice)
+4. **They configure their chair** — the system autosaves as they go
+5. **They submit their spec** — it appears in your Enquiries inbox and on the Pipeline board
+6. **You move them through stages** — as you update their status (reviewing, quoted, confirmed), they see the progress on their private tracking page
+
+No extra work: the system sends confirmations automatically.
+
+---
+
+## What's Next: The Operations System (Coming Later, in Stages)
+
+This marketing site and configurator are **System 1 & 2** of a three-system vision. Once the site is live and gathering real customer data, we'll build **System 3: the ops hub** — one place to run the entire business.
+
+The ops system will include:
+- **Auto-generated quotes** based on customer specs and real pricing
+- **Delivery estimates** calculated from production lead times and courier schedules
+- **Stock & parts tracking** with supplier lead times and inventory visibility
+- **Production tracking** with full traceability (which part went into which chair, by who, when)
+- **Owners' dashboard** — after purchase, customers see service history, warranty, maintenance tips, and proactive care alerts
+- **AI-assisted quoting** and later, a connected "digital twin" of each chair for predictive maintenance
+
+The data structure is already in place (the `config_payload` and `status` fields are the bridge between configurator and ops), so when we build System 3, it plugs in seamlessly.
+
+---
+
+## The Three Links to Share Today
+
+Once setup is complete, here are the three links to give to customers and colleagues:
+
+1. **The Website:** `https://centaurrobotics.com` (or backup: `https://centaurrobotics1.vercel.app`)
+   - Public marketing site, enquiry form, story, and product information
+
+2. **Build Studio (Configurator):** Generated per customer (e.g., `https://centaurrobotics.com/build/CEN-001?t=<secret>`)
+   - Private link you send to each customer; they design their chair, it saves automatically
+
+3. **Staff Control Panel:** `https://centaurrobotics.com/staff`
+   - Login required; your team uses this to manage enquiries, builds, and order status
 
 ---
 
 ## Where We Are
 
-The website is live and performing well. Your admin panel is coming together — within a week or two, you'll be able to log in and see every customer enquiry and configuration in one place. The SSL certificate needs a quick fix, and we're waiting on content and sign-offs from you (logo, photos, testimonials, company details, and the founder story). Once those land, we'll finalize the design and get everything formally launch-ready. The full operations system (stock, orders, forecasting) comes next, and we'll spec that once the admin panel is solid. You're on track.
+The hard engineering is done. The site is live, the system is built, and the processes are in place. Five quick setup steps turn it into a live, fully-tracked customer pipeline.
 
+No medical claims on the site, no pricing on the public pages (pricing lives only in the staff system where it's safe), and everything is built to accessibility standards so it works for everyone.
+
+You're ready. Let's go live.
+
+---
+
+**Questions?** Reach out — we're here to walk you through the setup or take it on ourselves if you prefer.
