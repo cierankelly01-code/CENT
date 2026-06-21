@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { DEMO_MODE } from "@/lib/admin/demo";
+import DemoBanner from "@/components/staff/DemoBanner";
 
 export const metadata: Metadata = {
   title: "Centaur — Staff",
@@ -36,6 +38,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
           </nav>
         </div>
       </header>
+      {DEMO_MODE && <DemoBanner />}
       <main id="main" className="flex-1">
         {children}
       </main>

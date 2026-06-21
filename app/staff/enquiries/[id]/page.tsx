@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffGetEnquiry, ENQUIRY_STATUSES } from "@/lib/admin/orders";
+import { DEMO_MODE, demoEnquiryById } from "@/lib/admin/demo";
 import { setEnquiryStatus } from "@/app/staff/actions";
 import StatusSelect from "@/components/staff/StatusSelect";
 
@@ -24,7 +25,7 @@ function payloadRows(payload: unknown): { key: string; value: string }[] {
 
 export default async function StaffEnquiryDetail({ params }: { params: { id: string } }) {
   await requireStaff();
-  const enquiry = await staffGetEnquiry(params.id);
+  const enquiry = DEMO_MODE ? demoEnquiryById(params.id) : await staffGetEnquiry(params.id);
   if (!enquiry) notFound();
   const spec = payloadRows(enquiry.config_payload);
 

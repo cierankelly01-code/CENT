@@ -1,12 +1,13 @@
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffListEnquiries } from "@/lib/admin/orders";
+import { DEMO_MODE, demoEnquiries } from "@/lib/admin/demo";
 import EnquiriesTable from "@/components/staff/EnquiriesTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function StaffEnquiries() {
   await requireStaff();
-  const enquiries = await staffListEnquiries();
+  const enquiries = DEMO_MODE ? demoEnquiries : await staffListEnquiries();
 
   return (
     <div className="container-edge py-12">

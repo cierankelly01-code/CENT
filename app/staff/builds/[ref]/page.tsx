@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffGetBuild, STAFF_BUILD_STATUSES } from "@/lib/configurator/repository";
+import { DEMO_MODE, demoBuildDetail } from "@/lib/admin/demo";
 import { setBuildStatus } from "@/app/staff/actions";
 import StatusSelect from "@/components/staff/StatusSelect";
 import { buildFieldByKey } from "@/lib/configurator/options";
@@ -26,7 +27,7 @@ function specRows(payload: BuildConfigPayload) {
 
 export default async function StaffBuildDetail({ params }: { params: { ref: string } }) {
   await requireStaff();
-  const data = await staffGetBuild(params.ref);
+  const data = DEMO_MODE ? demoBuildDetail(params.ref) : await staffGetBuild(params.ref);
   if (!data) notFound();
   const { build, versions, events } = data;
   const rows = specRows(build.config_payload);

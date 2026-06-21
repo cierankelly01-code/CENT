@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffListBuilds } from "@/lib/configurator/repository";
+import { DEMO_MODE, demoBuilds } from "@/lib/admin/demo";
 import StatusBadge from "@/components/staff/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
 export default async function StaffBuildsPage() {
   await requireStaff();
-  const builds = await staffListBuilds();
+  const builds = DEMO_MODE ? demoBuilds : await staffListBuilds();
 
   return (
     <div className="container-edge py-12">

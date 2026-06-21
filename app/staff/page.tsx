@@ -3,11 +3,14 @@ import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffDashboardCounts, staffListEnquiries } from "@/lib/admin/orders";
 import GenerateLink from "@/components/staff/GenerateLink";
 import StatusBadge from "@/components/staff/StatusBadge";
+import { DEMO_MODE } from "@/lib/admin/demo";
+import DemoDashboard from "@/components/staff/demo/DemoDashboard";
 
 export const dynamic = "force-dynamic";
 
 export default async function StaffDashboard() {
   await requireStaff();
+  if (DEMO_MODE) return <DemoDashboard />;
   const [counts, recent] = await Promise.all([
     staffDashboardCounts(),
     staffListEnquiries(6),
