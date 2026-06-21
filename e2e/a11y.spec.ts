@@ -47,6 +47,6 @@ test("a11y: build studio flow", async ({ page }) => {
     if (!(await cont.isVisible().catch(() => false))) break;
     await cont.click();
   }
-  await expect(page.getByRole("button", { name: "Save my progress" })).toBeVisible();
-  await expectNoViolations(page, "studio — review");
+  await expect(page.getByRole("button", { name: "Send my specification" })).toBeVisible();
+  await expectNoViolations(page, "studio — review (summary + contact + consent)");
 });
