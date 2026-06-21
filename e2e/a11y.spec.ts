@@ -23,6 +23,7 @@ const ROUTES = [
   "/news",
   "/configure",
   "/privacy",
+  "/staff/login",
 ];
 
 for (const route of ROUTES) {
