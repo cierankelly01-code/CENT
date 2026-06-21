@@ -30,6 +30,7 @@ async function send(payload: EmailPayload): Promise<void> {
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) {
       // eslint-disable-next-line no-console

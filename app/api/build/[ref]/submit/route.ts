@@ -18,7 +18,9 @@ export async function POST(req: Request, { params }: Ctx): Promise<Response> {
   if (!token) return errorResponse("Missing access token.", 401);
   try {
     const body = await readJsonObject(req);
-    const origin = new URL(req.url).origin;
+    // Trusted base URL (not req.url — the Host header is client-controlled and the resume
+    // link is emailed to the customer).
+    const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "https://centaurrobotics.com";
     const config = await submitBuild(params.ref, token, {
       consent_given: body.consent_given,
       consent_text: body.consent_text,

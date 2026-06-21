@@ -31,6 +31,7 @@ Next.js (App Router) + TypeScript · Tailwind (channel-based CSS-var tokens) · 
   honour `prefers-reduced-motion`.
 
 ## Operating efficiently (token-conservative)
+
 - Terse narration; short commit messages and PR bodies.
 - Don't re-read files already seen in the session; prefer `grep` over reading whole files.
 - Use a subagent for any big multi-file search.
