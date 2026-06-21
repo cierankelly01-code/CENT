@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { humanizeStatus } from "@/lib/staff-format";
 
 // A status dropdown wired to a (bound) staff server action. Optimistic-ish: reflects the
 // chosen value immediately and reverts on error.
@@ -44,7 +45,7 @@ export default function StatusSelect({
       >
         {opts.map((o) => (
           <option key={o} value={o}>
-            {o}
+            {humanizeStatus(o)}
           </option>
         ))}
       </select>
