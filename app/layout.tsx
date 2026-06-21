@@ -56,18 +56,38 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Centaur Robotics",
-              url: SITE_URL,
-              logo: `${SITE_URL}/icon.svg`,
-              description: DESCRIPTION,
-              makesOffer: {
-                "@type": "Product",
-                name: "The Centaur",
-                category: "Self-balancing electric wheelchair",
-                description:
-                  "A self-balancing wheelchair that rises to eye level (820mm), fits standard doorways (470mm) and lowers to the table (480mm). Engineered to automotive standards.",
-              },
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: "Centaur Robotics",
+                  url: SITE_URL,
+                  logo: `${SITE_URL}/icon.svg`,
+                  description: DESCRIPTION,
+                  areaServed: "GB",
+                },
+                {
+                  "@type": "Product",
+                  name: "The Centaur",
+                  category: "Self-balancing electric wheelchair",
+                  description:
+                    "A self-balancing wheelchair that rises to eye level (820mm), fits standard doorways (470mm) and lowers to the table (480mm). Engineered to automotive standards.",
+                  brand: { "@id": `${SITE_URL}/#organization` },
+                  // Real, published specs only — no invented figures, no pricing.
+                  additionalProperty: [
+                    { "@type": "PropertyValue", name: "Seat height range", value: "480–820mm" },
+                    { "@type": "PropertyValue", name: "Width", value: "470mm" },
+                    { "@type": "PropertyValue", name: "Top speed", value: "4mph" },
+                    { "@type": "PropertyValue", name: "Range", value: "10+ miles" },
+                  ],
+                  offers: {
+                    "@type": "Offer",
+                    url: `${SITE_URL}/configure`,
+                    availability: "https://schema.org/PreOrder",
+                    // Pricing is handled off-site (by the team), so no price is published here.
+                  },
+                },
+              ],
             }),
           }}
         />
