@@ -11,6 +11,7 @@ const NAV = [
   { href: "/staff", label: "Dashboard" },
   { href: "/staff/enquiries", label: "Enquiries" },
   { href: "/staff/builds", label: "Builds" },
+  { href: "/staff/pipeline", label: "Pipeline" },
 ];
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
