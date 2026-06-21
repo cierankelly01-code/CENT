@@ -8,16 +8,16 @@ import type { BuildConfigPayload } from "@/lib/configurator/types";
 export const dynamic = "force-dynamic";
 
 function specRows(payload: BuildConfigPayload) {
-  const rows: { label: string; value: string }[] = [];
+  const rows: { key: string; label: string; value: string }[] = [];
   const labelFor = (key: string) => buildFieldByKey(key)?.label ?? key;
   for (const [key, sel] of Object.entries(payload.selections ?? {})) {
-    rows.push({ label: labelFor(key), value: sel.value });
+    rows.push({ key: `sel:${key}`, label: labelFor(key), value: sel.value });
   }
   for (const [key, arr] of Object.entries(payload.multi ?? {})) {
-    rows.push({ label: labelFor(key), value: arr.map((s) => s.value).join(", ") });
+    rows.push({ key: `multi:${key}`, label: labelFor(key), value: arr.map((s) => s.value).join(", ") });
   }
   for (const [key, text] of Object.entries(payload.freeText ?? {})) {
-    rows.push({ label: labelFor(key), value: text });
+    rows.push({ key: `text:${key}`, label: labelFor(key), value: text });
   }
   return rows;
 }
@@ -59,7 +59,7 @@ export default async function StaffBuildDetail({ params }: { params: { ref: stri
         ) : (
           <dl className="divide-y divide-mist">
             {rows.map((r) => (
-              <div key={r.label} className="flex justify-between gap-4 py-2.5">
+              <div key={r.key} className="flex justify-between gap-4 py-2.5">
                 <dt className="font-sans text-sm text-ink/70">{r.label}</dt>
                 <dd className="text-right font-sans text-sm font-medium text-ink">{r.value}</dd>
               </div>
