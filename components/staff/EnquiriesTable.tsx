@@ -83,7 +83,8 @@ export default function EnquiriesTable({ rows }: { rows: EnquirySummary[] }) {
                   <td className="py-3 pr-4 text-ink/80">{e.enquiry_type}</td>
                   <td className="py-3 pr-4 text-ink/80">{e.status}</td>
                   <td className="py-3 pr-4 text-ink/70">
-                    {new Date(e.created_at).toLocaleString("en-GB")}
+                    {/* Fixed UTC so server prerender and client hydration agree. */}
+                    {new Date(e.created_at).toLocaleString("en-GB", { timeZone: "UTC" })}
                   </td>
                 </tr>
               ))}

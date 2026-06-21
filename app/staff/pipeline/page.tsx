@@ -20,7 +20,7 @@ export default async function StaffPipeline() {
     <div className="container-edge py-12">
       <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">Pipeline</h1>
       <p className="mt-2 font-sans text-sm text-ink/70">
-        {builds.length} submitted build(s) across the stages.
+        {builds.length} build(s) in the pipeline.
       </p>
 
       <div className="mt-8 flex gap-4 overflow-x-auto pb-4">
