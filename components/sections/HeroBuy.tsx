@@ -49,7 +49,7 @@ export default function HeroBuy() {
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/configure"
-              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3.5 font-sans text-base font-semibold text-bone shadow-[0_12px_30px_-12px_rgba(176,125,75,0.8)] transition-colors hover:bg-[#6f4d29]"
+              className="inline-flex items-center rounded-full bg-bronze-deep px-7 py-3.5 font-sans text-base font-semibold text-bone shadow-[0_12px_30px_-12px_rgba(176,125,75,0.8)] transition-colors hover:bg-bronze-deeper"
             >
               Configure your Centaur
             </Link>

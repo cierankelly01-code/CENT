@@ -7,9 +7,11 @@
   --color-bone: 244 241 234;
   --color-ink: 26 23 20;
   --color-graphite: 35 32 32;
-  --color-bronze: 176 125 75;
-  --color-bronze-deep: 138 94 51;
-  --color-bronze-deeper: 111 77 41; /* #6F4D29 — darker hover shade for bronze-deep CTAs */
+  /* Richer, warmer accent (proposal): more saturated copper/bronze. Deepening the
+     CTA/text shade also lifts contrast on bone, so the WCAG AA gate stays green. */
+  --color-bronze: 184 122 58; /* #B87A3A — light accent (dots, focus ring) */
+  --color-bronze-deep: 140 88 36; /* #8C5824 — CTA bg + accent text on bone (AA-safe on tinted bone) */
+  --color-bronze-deeper: 116 70 26; /* #74461A — darker hover shade for bronze-deep CTAs */
   --color-mist: 218 212 200;
 }
 
