@@ -40,7 +40,7 @@ export default function StatusSelect({
         disabled={pending}
         onChange={(e) => onChange(e.target.value)}
         aria-label="Status"
-        className="rounded-md border border-mist bg-white px-3 py-1.5 font-sans text-sm text-ink disabled:opacity-60"
+        className="rounded-md border border-mist bg-bone px-3 py-1.5 font-sans text-sm text-ink disabled:opacity-60"
       >
         {opts.map((o) => (
           <option key={o} value={o}>

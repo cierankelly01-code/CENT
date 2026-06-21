@@ -1,4 +1,4 @@
-# Go Live: Three Links for Julian
+# Go Live: Three Links to Share
 
 You have three customer-facing systems ready to share. Here's what each one is, what to share today, and what we need to finish before real customers use them.
 

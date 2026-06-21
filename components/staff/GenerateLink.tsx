@@ -13,6 +13,7 @@ export default function GenerateLink() {
   function onGenerate() {
     setError(null);
     setCopied(false);
+    setLink(null);
     startTransition(async () => {
       try {
         setLink(await generateBuildLink());
@@ -68,7 +69,7 @@ export default function GenerateLink() {
               value={link.url}
               aria-label="Customer build link"
               onFocus={(e) => e.currentTarget.select()}
-              className="min-w-0 flex-1 rounded-md border border-mist bg-white px-3 py-2 font-sans text-sm text-ink"
+              className="min-w-0 flex-1 rounded-md border border-mist bg-bone px-3 py-2 font-sans text-sm text-ink"
             />
             <button
               type="button"
