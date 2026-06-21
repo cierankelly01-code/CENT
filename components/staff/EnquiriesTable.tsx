@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { EnquirySummary } from "@/lib/admin/orders";
+import StatusBadge from "@/components/staff/StatusBadge";
+import { humanizeStatus } from "@/lib/staff-format";
 
 // Client-side search + status filter over the enquiries list. (Status options are derived
 // from the rows so this stays a pure client component — no server-only import.)
@@ -44,7 +46,7 @@ export default function EnquiriesTable({ rows }: { rows: EnquirySummary[] }) {
           <option value="all">All statuses</option>
           {statuses.map((s) => (
             <option key={s} value={s}>
-              {s}
+              {humanizeStatus(s)}
             </option>
           ))}
         </select>
@@ -80,8 +82,8 @@ export default function EnquiriesTable({ rows }: { rows: EnquirySummary[] }) {
                     </Link>
                   </td>
                   <td className="py-3 pr-4 text-ink/80">{e.email}</td>
-                  <td className="py-3 pr-4 text-ink/80">{e.enquiry_type}</td>
-                  <td className="py-3 pr-4 text-ink/80">{e.status}</td>
+                  <td className="py-3 pr-4 text-ink/80 capitalize">{e.enquiry_type}</td>
+                  <td className="py-3 pr-4"><StatusBadge status={e.status} /></td>
                   <td className="py-3 pr-4 text-ink/70">
                     {/* Fixed UTC so server prerender and client hydration agree. */}
                     {new Date(e.created_at).toLocaleString("en-GB", { timeZone: "UTC" })}

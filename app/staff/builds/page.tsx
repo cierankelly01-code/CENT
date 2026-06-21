@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/configurator/staff-auth";
 import { staffListBuilds } from "@/lib/configurator/repository";
+import StatusBadge from "@/components/staff/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export default async function StaffBuildsPage() {
                   </td>
                   <td className="py-3 pr-4 text-ink">{b.customer_name ?? "—"}</td>
                   <td className="py-3 pr-4 text-ink/80">{b.customer_email ?? "—"}</td>
-                  <td className="py-3 pr-4 text-ink/80">{b.status}</td>
+                  <td className="py-3 pr-4"><StatusBadge status={b.status} /></td>
                   <td className="py-3 pr-4 text-ink/70">
                     {b.submitted_at ? new Date(b.submitted_at).toLocaleString("en-GB") : "—"}
                   </td>
