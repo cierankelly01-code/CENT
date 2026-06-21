@@ -9,6 +9,7 @@
   --color-graphite: 35 32 32;
   --color-bronze: 176 125 75;
   --color-bronze-deep: 138 94 51;
+  --color-bronze-deeper: 111 77 41; /* #6F4D29 — darker hover shade for bronze-deep CTAs */
   --color-mist: 218 212 200;
 }
 

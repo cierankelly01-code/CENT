@@ -1,8 +1,8 @@
-import StudioWelcome from "@/components/studio/StudioWelcome";
+import StudioBuilder from "@/components/studio/StudioBuilder";
 
 // Capability-linked, per-build page — server-rendered on demand, never prerendered.
 export const dynamic = "force-dynamic";
 
 export default function BuildRefPage({ params }: { params: { ref: string } }) {
-  return <StudioWelcome reference={params.ref} />;
+  return <StudioBuilder reference={params.ref} />;
 }
