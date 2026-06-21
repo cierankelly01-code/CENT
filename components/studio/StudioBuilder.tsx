@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BUILD_STEPS,
   optionLabel,
@@ -8,6 +8,7 @@ import {
   type BuildStep,
 } from "@/lib/configurator/options";
 import { useStudioStatus } from "@/components/studio/StudioStatus";
+import { fromPayload, toPayload, type ClientAnswers } from "@/lib/configurator/payload";
 
 // Registry-driven multi-step builder. Client-side with localStorage persistence (keyed by
 // the build reference) so the customer can leave and return on this device. Server autosave +
@@ -80,16 +81,26 @@ export default function StudioBuilder({ reference }: { reference: string }) {
     setHydrated(true);
   }, [storageKey]);
 
-  // Persist on change.
+  // Persist locally on change (instant, offline-safe). Server sync owns the save indicator
+  // when a token is present; in local-only mode the indicator stays on its idle label.
   useEffect(() => {
     if (!hydrated) return;
     try {
       localStorage.setItem(storageKey, JSON.stringify({ step, selections, multi, freeText }));
-      setState("saved");
     } catch {
-      setState("error");
+      /* ignore quota/availability errors — server sync is the durable store */
     }
-  }, [hydrated, step, selections, multi, freeText, storageKey, setState]);
+  }, [hydrated, step, selections, multi, freeText, storageKey]);
+
+  // Apply a server-loaded config to local state (used on resume).
+  const applyServer = useCallback((a: ClientAnswers) => {
+    setSelections(a.selections);
+    setMulti(a.multi);
+    setFreeText(a.freeText);
+  }, []);
+
+  // Server load (resume) + debounced autosave, when opened via a capability link (?t=).
+  useBuildSync({ reference, hydrated, selections, multi, freeText, step, applyServer });
 
   const setSingle = (key: string, code: string) =>
     setSelections((prev) => ({ ...prev, [key]: code }));
@@ -288,6 +299,86 @@ export default function StudioBuilder({ reference }: { reference: string }) {
       </div>
     </div>
   );
+}
+
+// --- Server sync (capability-link load + debounced autosave) ---------------
+
+/**
+ * When the studio is opened via a capability link (`?t=<token>`), load the saved build from
+ * the server (cross-device resume) and autosave changes back (debounced). Degrades cleanly:
+ * with no token (or if the request fails) the builder stays in local-only mode and the rest
+ * of the UI is unaffected.
+ */
+function useBuildSync({
+  reference,
+  hydrated,
+  selections,
+  multi,
+  freeText,
+  step,
+  applyServer,
+}: {
+  reference: string;
+  hydrated: boolean;
+  selections: Record<string, string>;
+  multi: Record<string, string[]>;
+  freeText: Record<string, string>;
+  step: number;
+  applyServer: (answers: ClientAnswers) => void;
+}) {
+  const { setState } = useStudioStatus();
+  const [token, setToken] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  // Read the capability token from the URL (avoids a Suspense boundary).
+  useEffect(() => {
+    setToken(new URLSearchParams(window.location.search).get("t"));
+  }, []);
+
+  // Load the server copy once local hydration has happened.
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    (async () => {
+      if (token) {
+        try {
+          const res = await fetch(
+            `/api/build/${encodeURIComponent(reference)}?t=${encodeURIComponent(token)}`
+          );
+          if (res.ok) {
+            const { config } = await res.json();
+            if (!cancelled && config?.config_payload) applyServer(fromPayload(config.config_payload));
+          }
+        } catch {
+          /* offline / unavailable — keep local state */
+        }
+      }
+      if (!cancelled) setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, token, reference, applyServer]);
+
+  // Debounced autosave to the server (only when opened with a token).
+  useEffect(() => {
+    if (!loaded || !token) return;
+    setState("saving");
+    const payload = toPayload({ selections, multi, freeText, lastStep: step });
+    const id = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/build/${encodeURIComponent(reference)}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json", "x-build-token": token },
+          body: JSON.stringify({ config_payload: payload }),
+        });
+        setState(res.ok ? "saved" : "error");
+      } catch {
+        setState("error");
+      }
+    }, 800);
+    return () => clearTimeout(id);
+  }, [loaded, token, selections, multi, freeText, step, reference, setState]);
 }
 
 // --- Field rendering -------------------------------------------------------
