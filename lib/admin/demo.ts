@@ -20,16 +20,29 @@ import type {
 /** Master switch — OFF unless NEXT_PUBLIC_STAFF_DEMO=1 (safe default for production). */
 export const DEMO_MODE: boolean = process.env.NEXT_PUBLIC_STAFF_DEMO === "1";
 
+/** Demo role gate. Sensitive financials (revenue, cash, order book) only show for leadership
+ *  (CEO/CFO). Set NEXT_PUBLIC_STAFF_ROLE=leadership to see them; default is operations. */
+export const IS_LEADERSHIP: boolean = process.env.NEXT_PUBLIC_STAFF_ROLE === "leadership";
+
 // ── Dashboard ───────────────────────────────────────────────────────────────
 
 export type Kpi = { label: string; value: string; sub: string };
-export const demoKpis: Kpi[] = [
-  { label: "Pipeline value", value: "£284,500", sub: "weighted, open" },
-  { label: "Order book", value: "£128,000", sub: "confirmed builds" },
+
+/** Operational KPIs — visible to all staff. */
+export const demoKpisOps: Kpi[] = [
+  { label: "New enquiries", value: "2", sub: "today" },
+  { label: "In production", value: "5", sub: "active builds" },
+  { label: "Awaiting parts", value: "3", sub: "builds blocked" },
   { label: "Quote → order", value: "62%", sub: "last 90 days" },
   { label: "Lead → quote", value: "1.4 days", sub: "average" },
-  { label: "Cash runway", value: "7.2 mo", sub: "at current burn" },
   { label: "NPS", value: "72", sub: "post-delivery" },
+];
+
+/** Financial KPIs — leadership (CEO/CFO) only. */
+export const demoKpisFinance: Kpi[] = [
+  { label: "Pipeline value", value: "£284,500", sub: "weighted, open" },
+  { label: "Order book", value: "£128,000", sub: "confirmed builds" },
+  { label: "Cash runway", value: "7.2 mo", sub: "at current burn" },
 ];
 
 export type MonthPoint = { month: string; orders: number; revenue: number };
