@@ -22,6 +22,7 @@ const ROUTES = [
   "/why-us",
   "/news",
   "/configure",
+  "/accessibility",
   "/privacy",
   "/staff/login",
   "/track/CEN-TEST",

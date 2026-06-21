@@ -73,9 +73,14 @@ export default function Footer() {
             England &amp; Wales, company no.{" "}
             <span className="text-ink/70">[TBC]</span>.
           </p>
-          <Link href="/privacy" className="hover:text-ink">
-            Privacy policy
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/accessibility" className="hover:text-ink">
+              Accessibility
+            </Link>
+            <Link href="/privacy" className="hover:text-ink">
+              Privacy policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
