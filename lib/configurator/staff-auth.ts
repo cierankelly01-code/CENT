@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { isStaffEmail } from "./staff-allowlist";
 
 type CookieList = { name: string; value: string; options?: CookieOptions }[];
 import type { User } from "@supabase/supabase-js";
@@ -41,6 +42,6 @@ export async function getStaffUser(): Promise<User | null> {
 
 export async function requireStaff(): Promise<User> {
   const user = await getStaffUser();
-  if (!user) redirect("/staff/login");
+  if (!user || !isStaffEmail(user.email)) redirect("/staff/login");
   return user;
 }
