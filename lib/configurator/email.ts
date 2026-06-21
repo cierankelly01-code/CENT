@@ -33,8 +33,9 @@ async function send(payload: EmailPayload): Promise<void> {
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) {
+      // Log status only — the response body can echo recipient/content (PII), keep it out of logs.
       // eslint-disable-next-line no-console
-      console.error("resend send failed:", res.status, await res.text().catch(() => ""));
+      console.error("resend send failed with status", res.status);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
