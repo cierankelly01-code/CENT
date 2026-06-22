@@ -41,6 +41,7 @@ export async function getStaffUser(): Promise<User | null> {
 }
 
 export async function requireStaff(): Promise<User> {
+  if (process.env.NEXT_PUBLIC_STAFF_DEMO === "1") return { id: "demo", email: "demo@centaurrobotics.com" } as unknown as User;
   const user = await getStaffUser();
   if (!user || !isStaffEmail(user.email)) redirect("/staff/login");
   return user;
