@@ -382,10 +382,10 @@ export default function ConfigureClient() {
               style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
             />
           </div>
-          <div className="mt-2 hidden gap-0 sm:flex">
+          <div className="mt-2 hidden gap-0 sm:flex" aria-hidden="true">
             {STEP_LABELS.map((label, i) => (
               <div key={label} className="flex-1 text-center">
-                <span className={`font-sans text-[10px] uppercase tracking-[0.12em] ${i === step ? "text-bronze-deep" : i < step ? "text-ink/40" : "text-ink/20"}`}>
+                <span className={`font-sans text-[10px] uppercase tracking-[0.12em] ${i === step ? "text-bronze-deep" : "text-ink/40"}`}>
                   {label}
                 </span>
               </div>
