@@ -83,8 +83,17 @@ const TIMEFRAMES = [
   "Just exploring",
 ];
 
+const ORG_SIZES = ["1–2 chairs", "3–5 chairs", "6–10 chairs", "11–25 chairs", "25+ chairs"];
+const VENUE_TYPES = ["NHS Trust / Hospital", "Care home", "Stadium or venue", "Workplace", "Education", "Other"];
+const OT_REFERRAL = [
+  ["yes", "Yes — we have an OT involved"],
+  ["no", "No — self-referring"],
+  ["not-yet", "Not yet — can you help?"],
+] as const;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TOTAL_STEPS = 6;
+const STEP_LABELS = ["About you", "Fit", "Controls", "Wishes", "Style", "Review"];
 
 export default function ConfigureClient() {
   const [step, setStep] = useState(0);
@@ -110,11 +119,17 @@ export default function ConfigureClient() {
   const [tone, setTone] = useState("");
   const [finish, setFinish] = useState("");
   const [engraving, setEngraving] = useState("");
+  // Org-specific (step 0 branch)
+  const [orgName, setOrgName] = useState("");
+  const [orgSize, setOrgSize] = useState("");
+  const [venueType, setVenueType] = useState("");
+  const [otReferral, setOtReferral] = useState("");
   // Step 6 — details
   const [timeframe, setTimeframe] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [vatRelief, setVatRelief] = useState(false);
   const [consent, setConsent] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -146,10 +161,15 @@ export default function ConfigureClient() {
         if (s.tone) setTone(s.tone);
         if (s.finish) setFinish(s.finish);
         if (s.engraving) setEngraving(s.engraving);
+        if (s.orgName) setOrgName(s.orgName);
+        if (s.orgSize) setOrgSize(s.orgSize);
+        if (s.venueType) setVenueType(s.venueType);
+        if (s.otReferral) setOtReferral(s.otReferral);
         if (s.timeframe) setTimeframe(s.timeframe);
         if (s.name) setName(s.name);
         if (s.email) setEmail(s.email);
         if (s.phone) setPhone(s.phone);
+        if (typeof s.vatRelief === "boolean") setVatRelief(s.vatRelief);
         if (typeof s.step === "number") setStep(s.step);
       }
     } catch {
@@ -164,7 +184,7 @@ export default function ConfigureClient() {
     const snapshot = {
       step, forWhom, useCases, usage, height, weight, transfer, homeNotes, needs,
       control, hand, pace, wishes, upholstery, tone, finish, engraving,
-      timeframe, name, email, phone,
+      orgName, orgSize, venueType, otReferral, timeframe, name, email, phone, vatRelief,
     };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
@@ -174,7 +194,7 @@ export default function ConfigureClient() {
   }, [
     hydrated, step, forWhom, useCases, usage, height, weight, transfer, homeNotes,
     needs, control, hand, pace, wishes, upholstery, tone, finish, engraving,
-    timeframe, name, email, phone,
+    orgName, orgSize, venueType, otReferral, timeframe, name, email, phone, vatRelief,
   ]);
 
   const toggle = (setter: typeof setUseCases) => (id: string) =>
@@ -205,6 +225,12 @@ export default function ConfigureClient() {
     try {
       const config_payload = {
         for_whom: forWhom,
+        // Org-specific
+        org_name: orgName.trim() || null,
+        org_size: orgSize || null,
+        venue_type: venueType || null,
+        ot_referral: otReferral || null,
+        // Personal
         use_cases: useCases,
         usage_amount: usage || null,
         approx_height: height || null,
@@ -221,6 +247,7 @@ export default function ConfigureClient() {
         frame_finish: finish || null,
         engraving: engraving.trim() || null,
         timeframe: timeframe || null,
+        vat_relief: vatRelief,
       };
       const { error } = await getSupabaseClient()
         .from("quote_requests")
@@ -287,22 +314,54 @@ export default function ConfigureClient() {
   ].filter(Boolean) as { l: string; v: string; s: number }[];
 
   if (done) {
+    const isOrg = forWhom === "organisation";
     return (
       <div className="container-edge py-24 md:py-32">
-        <div className="mx-auto max-w-xl rounded-lg border border-mist bg-bone p-10 text-center">
-          <p className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">
-            Thank you, {name.split(" ")[0] || "and welcome"}.
-          </p>
-          <p className="mt-4 font-sans text-lg leading-relaxed text-ink/70">
-            We&apos;ve got your specification. A member of the Centaur team will be
-            in touch to talk it through and arrange a test drive.
-          </p>
-          <Link
-            href="/"
-            className="mt-8 inline-flex items-center rounded-full bg-bronze-deep px-6 py-3 font-sans text-base font-semibold text-bone transition-colors hover:bg-[#6f4d29]"
-          >
-            Back to home
-          </Link>
+        <div className="mx-auto max-w-xl">
+          <div className="rounded-xl border border-mist bg-bone p-10 text-center">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-bronze-deep/10">
+              <svg className="h-7 w-7 text-bronze-deep" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            </div>
+            <p className="font-display text-3xl font-semibold tracking-[-0.02em] text-ink">
+              {isOrg ? "Enquiry received." : `Thank you, ${name.split(" ")[0] || "and welcome"}.`}
+            </p>
+            <p className="mt-4 font-sans text-base leading-relaxed text-ink/70">
+              {isOrg
+                ? "We’ve received your fleet enquiry. A dedicated account manager will be in touch within one working day."
+                : "We’ve got your specification. A member of the Centaur team will be in touch within 48 hours to talk it through and arrange a test drive."}
+            </p>
+          </div>
+
+          <div className="mt-8 rounded-xl border border-mist bg-bone p-6">
+            <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-bronze-deep">What happens next</p>
+            <ol className="mt-4 space-y-4">
+              {(isOrg ? [
+                { n: "1", t: "We review your fleet requirements", d: "Your enquiry goes straight to our enterprise team who specialise in multi-unit deployments." },
+                { n: "2", t: "Account manager call — within 1 working day", d: "We’ll discuss your venue, OT involvement, procurement process, and budget." },
+                { n: "3", t: "Fleet demo & site visit", d: "We bring a Centaur to your site so your team can experience it first-hand." },
+              ] : [
+                { n: "1", t: "We review your specification", d: "Our team reads every detail you’ve shared to understand exactly what you need." },
+                { n: "2", t: "We call within 48 hours", d: "A real person — no scripts, no pressure. Just a conversation about your Centaur." },
+                { n: "3", t: "Test drive at your convenience", d: "We’ll arrange a demo in a space that suits you — at home, or at one of our showrooms." },
+              ]).map((item) => (
+                <li key={item.n} className="flex gap-4">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bronze-deep/10 font-sans text-sm font-semibold text-bronze-deep">{item.n}</span>
+                  <div>
+                    <p className="font-sans text-sm font-semibold text-ink">{item.t}</p>
+                    <p className="mt-0.5 font-sans text-sm text-ink/60">{item.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link href="/" className="font-sans text-sm text-ink/60 underline underline-offset-2 hover:text-ink">
+              Back to home
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -314,14 +373,23 @@ export default function ConfigureClient() {
         {/* Progress */}
         <div className="mb-10">
           <div className="flex items-center justify-between font-sans text-sm text-ink/70">
+            <span className="font-medium text-ink">{STEP_LABELS[step]}</span>
             <span>Step {step + 1} of {TOTAL_STEPS}</span>
-            <span>{Math.round(((step + 1) / TOTAL_STEPS) * 100)}%</span>
           </div>
-          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-mist">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-mist">
             <div
               className="h-full rounded-full bg-bronze-deep transition-[width] duration-500 ease-out"
               style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
             />
+          </div>
+          <div className="mt-2 hidden gap-0 sm:flex">
+            {STEP_LABELS.map((label, i) => (
+              <div key={label} className="flex-1 text-center">
+                <span className={`font-sans text-[10px] uppercase tracking-[0.12em] ${i === step ? "text-bronze-deep" : i < step ? "text-ink/40" : "text-ink/20"}`}>
+                  {label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -332,13 +400,41 @@ export default function ConfigureClient() {
                 <Radio name="forWhom" value={forWhom} onChange={(v) => setForWhom(v as ForWhom)}
                   options={[["myself", "For myself"], ["someone", "For someone I care for"], ["organisation", "For an organisation"]]} />
               </Field>
-              <Field label="Where will it mostly be used?" hint="Select any that apply">
-                <Chips options={USE_CASES} selected={useCases} onToggle={toggle(setUseCases)} />
-              </Field>
-              <Field label="How much will you use it day-to-day?">
-                <Radio name="usage" value={usage} onChange={setUsage}
-                  options={USAGE.map((u) => [u, u] as [string, string])} />
-              </Field>
+
+              {forWhom === "organisation" ? (
+                <>
+                  <Field label="Organisation name">
+                    <input value={orgName} onChange={(e) => setOrgName(e.target.value)}
+                      className="w-full rounded-md border border-mist bg-bone px-4 py-3 font-sans text-base text-ink placeholder:text-ink/40"
+                      placeholder="e.g. Northgate NHS Trust" />
+                  </Field>
+                  <Field label="Type of venue or organisation">
+                    <Radio name="venueType" value={venueType} onChange={setVenueType}
+                      options={VENUE_TYPES.map((v) => [v, v] as [string, string])} />
+                  </Field>
+                  <Field label="How many Centaur chairs are you considering?">
+                    <Radio name="orgSize" value={orgSize} onChange={setOrgSize}
+                      options={ORG_SIZES.map((s) => [s, s] as [string, string])} />
+                  </Field>
+                  <Field label="Do you have an occupational therapist or procurement lead involved?">
+                    <Radio name="otReferral" value={otReferral} onChange={setOtReferral}
+                      options={OT_REFERRAL.map(([v, l]) => [v, l] as [string, string])} />
+                  </Field>
+                  <Field label="Where will the chairs be used?" hint="Select any that apply">
+                    <Chips options={USE_CASES} selected={useCases} onToggle={toggle(setUseCases)} />
+                  </Field>
+                </>
+              ) : (
+                <>
+                  <Field label="Where will it mostly be used?" hint="Select any that apply">
+                    <Chips options={USE_CASES} selected={useCases} onToggle={toggle(setUseCases)} />
+                  </Field>
+                  <Field label="How much will you use it day-to-day?">
+                    <Radio name="usage" value={usage} onChange={setUsage}
+                      options={USAGE.map((u) => [u, u] as [string, string])} />
+                  </Field>
+                </>
+              )}
             </Step>
           )}
 
@@ -452,6 +548,25 @@ export default function ConfigureClient() {
               <Field label="When are you looking to get your Centaur?">
                 <Select value={timeframe} onChange={setTimeframe} options={TIMEFRAMES} placeholder="Select timeframe" />
               </Field>
+
+              {forWhom !== "organisation" && (
+                <Field label="Are you working with an occupational therapist?">
+                  <Radio name="otReferral" value={otReferral} onChange={setOtReferral}
+                    options={OT_REFERRAL.map(([v, l]) => [v, l] as [string, string])} />
+                </Field>
+              )}
+
+              <div className="rounded-md border border-mist/70 bg-mist/10 p-4">
+                <label className="flex items-start gap-3 font-sans text-sm text-ink/70">
+                  <input type="checkbox" checked={vatRelief} onChange={(e) => setVatRelief(e.target.checked)}
+                    className="mt-1 h-4 w-4 accent-bronze-deep" />
+                  <span>
+                    <span className="font-medium text-ink">VAT relief — </span>
+                    I am purchasing for a disabled person. Zero-rate VAT may apply under HMRC regulations.
+                  </span>
+                </label>
+              </div>
+
               <div>
                 <label className="flex items-start gap-3 font-sans text-sm text-ink/70">
                   <input id="cf-consent" type="checkbox" checked={consent}
