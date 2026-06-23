@@ -17,7 +17,9 @@ export default function MarketingChrome({ children }: { children: React.ReactNod
     pathname === "/build" ||
     pathname?.startsWith("/build/") === true ||
     pathname === "/staff" ||
-    pathname?.startsWith("/staff/") === true;
+    pathname?.startsWith("/staff/") === true ||
+    pathname === "/fleet" ||
+    pathname?.startsWith("/fleet/") === true;
 
   if (standalone) return <>{children}</>;
 
