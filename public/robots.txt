@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /staff/
+Disallow: /status
+Disallow: /map
+Disallow: /api/
+Disallow: /fleet/
+
+Sitemap: https://centaurrobotics.com/sitemap.xml

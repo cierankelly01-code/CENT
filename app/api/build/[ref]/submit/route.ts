@@ -5,15 +5,23 @@ import {
   jsonResponse,
   readJsonObject,
 } from "@/lib/configurator/http";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Ctx = { params: { ref: string } };
 
-// POST /api/build/:ref/submit — record consent, snapshot a version, mark submitted.
-// Body: { consent_given, consent_text, config_payload?, customer_name?, customer_email?, customer_phone? }.
 export async function POST(req: Request, { params }: Ctx): Promise<Response> {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { ok, retryAfter } = rateLimit(`build-submit:${ip}`, 10, 60 * 60 * 1000);
+  if (!ok) {
+    return new Response(JSON.stringify({ error: "Too many requests" }), {
+      status: 429,
+      headers: { "Retry-After": String(retryAfter), "Content-Type": "application/json" },
+    });
+  }
+
   const token = getBuildToken(req);
   if (!token) return errorResponse("Missing access token.", 401);
   try {
