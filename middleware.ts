@@ -47,4 +47,4 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-export const config = { matcher: ["/staff/:path*"] };
+export const config = { matcher: ["/staff/:path*", "/status", "/map"] };

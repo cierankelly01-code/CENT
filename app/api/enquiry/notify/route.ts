@@ -1,14 +1,9 @@
 import { sendEnquiryEmails } from "@/lib/configurator/email";
 import { jsonResponse, errorResponse, readJsonObject } from "@/lib/configurator/http";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-// POST /api/enquiry/notify — fire-and-forget transactional email after a /configure submit
-// (the lead itself is saved client-side via the anon insert). Sends a customer acknowledgement
-// + a staff alert. Best-effort: always returns ok so it never disrupts the user's success state.
-// NOTE: public, like the anon insert. Content is benign and one-email-per-call; add rate limiting
-// (e.g. Upstash) as a hardening step before high-traffic launch.
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,6 +14,15 @@ function str(v: unknown, max = 2000): string | null {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { ok, retryAfter } = rateLimit(`enquiry:${ip}`, 5, 15 * 60 * 1000);
+  if (!ok) {
+    return new Response(JSON.stringify({ error: "Too many requests" }), {
+      status: 429,
+      headers: { "Retry-After": String(retryAfter), "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await readJsonObject(req);
     const email = str(body.email, 200);
