@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import MarketingChrome from "@/components/MarketingChrome";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -100,6 +102,8 @@ export default function RootLayout({
           Skip to content
         </a>
         <MarketingChrome>{children}</MarketingChrome>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
