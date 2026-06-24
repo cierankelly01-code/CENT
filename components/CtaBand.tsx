@@ -34,6 +34,9 @@ export default function CtaBand({
               Explore the Centaur
             </Link>
           </div>
+          <p className="mt-4 font-sans text-sm text-bone/55">
+            No payment, no commitment — and a test drive when you&apos;re ready.
+          </p>
         </Reveal>
       </div>
     </section>
