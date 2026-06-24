@@ -4,6 +4,9 @@ import "server-only";
 // submit still works before email is configured. From: hello@centaurrobotics.com — TBC until
 // the domain is verified, so defaults to Resend's test sender until RESEND_FROM is set.
 
+if (!process.env.RESEND_FROM && process.env.NODE_ENV === "production") {
+  console.warn("[email] RESEND_FROM not set — falling back to Resend test sender. Emails may be marked spam.");
+}
 const FROM = process.env.RESEND_FROM || "Centaur Robotics <onboarding@resend.dev>";
 const STAFF = process.env.STAFF_NOTIFY_EMAIL || "hello@centaurrobotics.com";
 

@@ -38,8 +38,9 @@ export async function POST(req: Request): Promise<Response> {
       message: str(body.message, 4000),
     });
     return jsonResponse({ ok: true });
-  } catch {
-    // Never surface — the enquiry is already captured.
+  } catch (err) {
+    // Log so failures surface in Vercel logs / Sentry — don't surface to customer.
+    console.error("[enquiry/notify] email send failed:", err);
     return jsonResponse({ ok: true });
   }
 }
