@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 type CheckResult = {
   name: string;
   ok: boolean;
-  plain: string; // plain-English status for Cieran
+  plain: string;
   detail?: string;
 };
 
@@ -65,7 +65,18 @@ async function checkEnvVar(name: string, label: string, plainOk: string, plainFa
   return { name: label, ok: true, plain: plainOk };
 }
 
-export async function GET() {
+// Trusted callers (e.g. ctrl dashboard) supply this token to get full detail.
+// Public callers get summary only — no config state revealed.
+function isAuthorised(req: NextRequest): boolean {
+  const token = process.env.STATUS_TOKEN;
+  if (!token) return false;
+  const header = req.headers.get("x-status-token");
+  return header === token;
+}
+
+export async function GET(req: NextRequest) {
+  const authorised = isAuthorised(req);
+
   const [
     supabaseAnon,
     supabaseService,
@@ -83,6 +94,16 @@ export async function GET() {
   const checks = [supabaseAnon, supabaseService, resend, siteUrl, staffEmails];
   const allOk = checks.every((c) => c.ok);
 
+  // Public response: overall status only — no config details
+  if (!authorised) {
+    return NextResponse.json({
+      ok: allOk,
+      summary: allOk ? "All systems operational." : "Some systems need attention.",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Authorised response: full detail for ctrl dashboard
   return NextResponse.json({
     ok: allOk,
     summary: allOk

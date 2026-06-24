@@ -159,12 +159,10 @@ export async function saveDraft(
 
   const update: Record<string, unknown> = {};
   if (patch.config_payload !== undefined) update.config_payload = validatePayload(patch.config_payload);
-  const name = clean(patch.customer_name);
-  const email = clean(patch.customer_email);
-  const phone = clean(patch.customer_phone);
-  if (name) update.customer_name = name;
-  if (email) update.customer_email = email;
-  if (phone) update.customer_phone = phone;
+  // Use `!== undefined` so an explicit null/empty string clears the field server-side.
+  if (patch.customer_name !== undefined) update.customer_name = clean(patch.customer_name) ?? null;
+  if (patch.customer_email !== undefined) update.customer_email = clean(patch.customer_email) ?? null;
+  if (patch.customer_phone !== undefined) update.customer_phone = clean(patch.customer_phone) ?? null;
 
   if (Object.keys(update).length === 0) return toClientBuildConfig(row);
 
