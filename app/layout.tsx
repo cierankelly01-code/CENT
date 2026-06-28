@@ -4,6 +4,7 @@ import "./globals.css";
 import MarketingChrome from "@/components/MarketingChrome";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AxeDevtools from "@/components/AxeDevtools";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -104,6 +105,7 @@ export default function RootLayout({
         <MarketingChrome>{children}</MarketingChrome>
         <Analytics />
         <SpeedInsights />
+        <AxeDevtools />
       </body>
     </html>
   );
