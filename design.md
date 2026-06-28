@@ -99,3 +99,4 @@ This is a disability product. Accessibility is non-negotiable.
 - No off-road capability claims (smooth-surface only)
 - No invented funding figures, partner names, or trial results
 - Placeholder copy flagged `CLIENT —` or `TBC` until client supplies real content
+
