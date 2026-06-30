@@ -3,11 +3,13 @@ import { FLEET_ORGS, alertCount } from "@/lib/fleet/demo";
 
 export const dynamic = "force-dynamic";
 
-const ORG_ICONS: Record<string, string> = {
-  "nhs-trust": "🏥",
-  "city-stadium": "🏟️",
-  "riverside-care": "🏡",
+const ORG_ICON_PATHS: Record<string, string> = {
+  "nhs-trust": "M12 3v18M5 8h14a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Zm4 5h6",
+  "city-stadium": "M3 16c3-2.2 15-2.2 18 0M5 16V9.5C5 6 8 4 12 4s7 2 7 5.5V16M9 16v3M15 16v3",
+  "riverside-care": "M4 11.5 12 4l8 7.5M6.5 10v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-9M10 20v-5h4v5",
 };
+const DEFAULT_ORG_ICON_PATH =
+  "M4 8.5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.5ZM9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M4 13h16";
 
 export default function FleetDashboard() {
   const totalChairs = FLEET_ORGS.reduce((n, o) => n + o.chairs.length, 0);
@@ -50,7 +52,9 @@ export default function FleetDashboard() {
               className="group rounded-xl border border-mist bg-bone p-6 shadow-[0_1px_2px_rgba(26,23,20,0.04)] transition-all hover:border-bronze-deep/40 hover:shadow-md motion-reduce:transition-none"
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="text-3xl" role="img" aria-label={org.type}>{ORG_ICONS[org.slug] ?? "🏢"}</span>
+                <svg className="h-7 w-7 text-bronze-deep" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-label={org.type} role="img">
+                  <path strokeLinecap="round" strokeLinejoin="round" d={ORG_ICON_PATHS[org.slug] ?? DEFAULT_ORG_ICON_PATH} />
+                </svg>
                 {alerts > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 font-sans text-xs font-semibold text-amber-700">
                     {alerts} alert{alerts > 1 ? "s" : ""}

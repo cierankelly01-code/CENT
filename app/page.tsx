@@ -28,7 +28,7 @@ const TEASERS = [
 
 export default function Home() {
   return (
-    <>
+    <main id="main">
       <HeroBuy />
 
       {/* Key facts */}
@@ -130,13 +130,31 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 gap-4 content-start">
                 {[
-                  { label: "NHS trusts", icon: "🏥", desc: "Ward-ready. MHRA-compliant pathway." },
-                  { label: "Stadiums & venues", icon: "🏟️", desc: "Dignity for every fan, every match day." },
-                  { label: "Care homes", icon: "🏡", desc: "Fleet management built for your team." },
-                  { label: "Workplaces", icon: "🏢", desc: "Independence at work, not dependence on others." },
+                  {
+                    label: "NHS trusts",
+                    desc: "Ward-ready. MHRA-compliant pathway.",
+                    path: "M12 3v18M5 8h14a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Zm4 5h6",
+                  },
+                  {
+                    label: "Stadiums & venues",
+                    desc: "Dignity for every fan, every match day.",
+                    path: "M3 16c3-2.2 15-2.2 18 0M5 16V9.5C5 6 8 4 12 4s7 2 7 5.5V16M9 16v3M15 16v3",
+                  },
+                  {
+                    label: "Care homes",
+                    desc: "Fleet management built for your team.",
+                    path: "M4 11.5 12 4l8 7.5M6.5 10v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-9M10 20v-5h4v5",
+                  },
+                  {
+                    label: "Workplaces",
+                    desc: "Independence at work, not dependence on others.",
+                    path: "M4 8.5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.5ZM9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M4 13h16",
+                  },
                 ].map((card) => (
                   <div key={card.label} className="rounded-xl border border-mist bg-bone p-5 shadow-[0_1px_2px_rgba(26,23,20,0.04)]">
-                    <span className="text-2xl" role="img" aria-label={card.label}>{card.icon}</span>
+                    <svg className="h-6 w-6 text-bronze-deep" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d={card.path} />
+                    </svg>
                     <p className="mt-3 font-sans text-sm font-semibold text-ink">{card.label}</p>
                     <p className="mt-1 font-sans text-xs leading-relaxed text-ink/60">{card.desc}</p>
                   </div>
@@ -182,6 +200,6 @@ export default function Home() {
 
       <Faq />
       <CtaBand />
-    </>
+    </main>
   );
 }

@@ -33,7 +33,7 @@ export default async function MapPage() {
   const statusJson = JSON.stringify({ dbOk, serviceOk, emailOk, siteUrlOk, staffOk });
 
   return (
-    <div className="min-h-screen bg-[#0a0c10] text-[#c9d1d9] font-sans flex flex-col">
+    <main id="main" className="min-h-screen bg-[#0a0c10] text-[#c9d1d9] font-sans flex flex-col">
       <header className="bg-[#0d1117] border-b border-[#21262d] px-6 py-3.5 flex items-center justify-between flex-shrink-0">
         <div className="font-bold text-sm text-[#e6edf3] tracking-tight">
           Centaur <span className="text-[#58a6ff]">Ops</span> — Architecture Map
@@ -53,7 +53,7 @@ export default async function MapPage() {
         <canvas id="map" className="w-full h-full" data-status={statusJson} />
       </div>
       <script dangerouslySetInnerHTML={{ __html: MAP_SCRIPT }} />
-    </div>
+    </main>
   );
 }
 
