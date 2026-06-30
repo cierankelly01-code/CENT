@@ -49,6 +49,28 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Eligibility signpost — answer "is this for me" early, before the deep dive */}
+      <section className="border-t border-mist bg-mist/30">
+        <div className="container-edge py-10 md:py-12">
+          <Reveal>
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <p className="max-w-2xl font-sans text-base leading-relaxed text-ink/80">
+                <span className="font-semibold text-ink">Is the Centaur for you? </span>
+                Built for people who can&apos;t comfortably walk more than around 400m
+                unaided — but who get on with their day otherwise.
+              </p>
+              <Link
+                href="/who-its-for"
+                className="inline-flex shrink-0 items-center gap-1.5 font-sans text-sm font-semibold text-bronze-deep transition-colors hover:text-ink"
+              >
+                Who it&apos;s for
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       <RiseExperience />
       <Comparison />
       <Specs />
