@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default function AccessibilityPage() {
   return (
-    <>
+    <main id="main">
       <PageHeader
         eyebrow="Accessibility"
         title="Built to be used by everyone."
-        intro="We make a mobility product for disabled people. It would be a contradiction if the way you learn about it, or spec your own, wasn't accessible too. So accessibility is part of how we build — not an afterthought."
+        intro="We make a mobility product for people with limited mobility. It would be a contradiction if the way you learn about it, or spec your own, wasn't accessible too. So accessibility is part of how we build — not an afterthought."
       />
 
       <section className="border-t border-mist bg-bone">
@@ -79,6 +79,6 @@ export default function AccessibilityPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

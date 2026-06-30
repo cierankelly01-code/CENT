@@ -35,13 +35,13 @@ export default async function StatusPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-8">
+      <main id="main" className="min-h-screen bg-[#0a0c10] flex items-center justify-center p-8">
         <div className="rounded-xl border border-red-900 bg-red-950/40 p-8 text-center max-w-sm">
           <p className="text-2xl mb-3">⚠️</p>
           <p className="text-red-300 font-semibold mb-1">Status check failed</p>
           <p className="text-red-400 text-sm">Could not reach the status API. Try refreshing in 30 seconds.</p>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -57,7 +57,7 @@ export default async function StatusPage() {
   const fixItems = [...failing, ...warnings];
 
   return (
-    <div className="min-h-screen bg-[#0a0c10] text-[#c9d1d9] font-sans">
+    <main id="main" className="min-h-screen bg-[#0a0c10] text-[#c9d1d9] font-sans">
 
       {/* Header */}
       <header className="bg-[#0d1117] border-b border-[#21262d] px-6 py-3.5 flex items-center justify-between">
@@ -194,6 +194,6 @@ export default async function StatusPage() {
         </div>
 
       </div>
-    </div>
+    </main>
   );
 }

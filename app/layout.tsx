@@ -96,12 +96,14 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-ink focus:px-5 focus:py-2 focus:font-sans focus:text-sm focus:text-bone"
-        >
-          Skip to content
-        </a>
+        <nav aria-label="Skip links">
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-ink focus:px-5 focus:py-2 focus:font-sans focus:text-sm focus:text-bone"
+          >
+            Skip to content
+          </a>
+        </nav>
         <MarketingChrome>{children}</MarketingChrome>
         <Analytics />
         <SpeedInsights />

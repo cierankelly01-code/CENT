@@ -17,7 +17,7 @@ export default function WhoItsForPage() {
       <PageHeader
         eyebrow="Who it's for"
         title="For your home, and the places you move through."
-        intro="Independence and dignity at home — and a better experience to offer for care homes, hospitals, airports and venues."
+        intro="Built for people who can't comfortably walk more than around 400m unaided — but who get on with their day otherwise. Independence and dignity at home, and a better experience to offer for care homes, hospitals, airports and venues."
       />
       <WhoItsFor />
       <DayInTheLife />
